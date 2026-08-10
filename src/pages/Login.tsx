@@ -1,57 +1,70 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mortarboard01Icon,
-  UserGroupIcon,
-  TeacherIcon,
-  StudentIcon,
-  UserMultipleIcon,
   ArrowRight01Icon,
   SquareLock01Icon,
   Mail01Icon,
+  UserCircleIcon,
+  ViewIcon,
+  ViewOffSlashIcon,
 } from "hugeicons-react";
-import { cn } from "../lib/utils";
 import { school } from "../data/mock";
 import { Button } from "../components/ui";
+import { ROLES, ROLE_META, type Role } from "../types/roles";
+import { useAuth } from "../auth/AuthContext";
+import { DEMO_PASSWORD } from "../data/users";
+import { useToast } from "../components/Toast";
 
-const portals = [
-  {
-    role: "admin",
-    label: "Administration",
-    desc: "Full system control — users, finance & operations",
-    icon: UserGroupIcon,
-    color: "bg-brand-50 text-brand-600 ring-brand-100",
-  },
-  {
-    role: "teacher",
-    label: "Teacher",
-    desc: "Classroom delivery, assessments & progress",
-    icon: TeacherIcon,
-    color: "bg-blue-50 text-blue-600 ring-blue-100",
-  },
-  {
-    role: "student",
-    label: "Student",
-    desc: "Results, assignments, schedule & resources",
-    icon: StudentIcon,
-    color: "bg-success-50 text-success-600 ring-success-100",
-  },
-  {
-    role: "parent",
-    label: "Parent / Guardian",
-    desc: "Monitor progress, fees & communication",
-    icon: UserMultipleIcon,
-    color: "bg-orange-50 text-orange-600 ring-orange-100",
-  },
-] as const;
+const roleOptions = ROLES.map((r) => ({ value: r, ...ROLE_META[r] }));
+
+const demoHints: { role: Role; email: string }[] = [
+  { role: "admin", email: "admin@kingsford.edu.gh" },
+  { role: "headmaster", email: "headmaster@kingsford.edu.gh" },
+  { role: "accountant", email: "accountant@kingsford.edu.gh" },
+  { role: "teacher", email: "teacher@kingsford.edu.gh" },
+  { role: "librarian", email: "librarian@kingsford.edu.gh" },
+  { role: "hr", email: "hr@kingsford.edu.gh" },
+  { role: "student", email: "student@kingsford.edu.gh" },
+  { role: "parent", email: "parent@kingsford.edu.gh" },
+];
 
 export default function Login() {
-  const [selected, setSelected] = useState<(typeof portals)[number]["role"]>("admin");
+  const [role, setRole] = useState<Role>("admin");
+  const [email, setEmail] = useState("admin@kingsford.edu.gh");
+  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
+
+  const onRoleChange = (next: Role) => {
+    setRole(next);
+    const hint = demoHints.find((d) => d.role === next);
+    if (hint) setEmail(hint.email);
+    setPassword(DEMO_PASSWORD);
+    setError("");
+  };
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const result = login(email, password, role);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error);
+      toast(result.error, "error");
+      return;
+    }
+    toast(`Welcome back — signed in as ${ROLE_META[role].label}`);
+    navigate(ROLE_META[role].portalPath);
+  };
 
   return (
     <div className="flex min-h-screen">
-      {/* Left — form */}
       <div className="flex w-full flex-col justify-center px-6 py-12 sm:px-12 lg:w-[560px] lg:shrink-0 lg:px-20">
         <div className="mx-auto w-full max-w-md">
           <div className="flex items-center gap-3">
@@ -64,94 +77,132 @@ export default function Login() {
             </div>
           </div>
 
-          <h1 className="mt-10 text-3xl font-bold tracking-tight text-gray-900">Welcome back</h1>
-          <p className="mt-2 text-gray-500">Select your portal and sign in to continue.</p>
+          <h1 className="mt-10 text-3xl font-bold tracking-tight text-gray-900">Sign in</h1>
+          <p className="mt-2 text-gray-500">Choose your role, then enter your school email and password.</p>
 
-          {/* Portal selection */}
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            {portals.map((p) => (
-              <button
-                key={p.role}
-                onClick={() => setSelected(p.role)}
-                className={cn(
-                  "rounded-xl border p-4 text-left transition-all",
-                  selected === p.role
-                    ? "border-brand-600 bg-brand-25 ring-4 ring-brand-100"
-                    : "border-gray-200 bg-white hover:border-gray-300",
-                )}
-              >
-                <div className={cn("mb-2.5 flex size-9 items-center justify-center rounded-lg ring-4", p.color)}>
-                  <p.icon size={20} />
-                </div>
-                <p className="text-sm font-semibold text-gray-900">{p.label}</p>
-                <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{p.desc}</p>
-              </button>
-            ))}
-          </div>
+          <form className="mt-8 space-y-4" onSubmit={onSubmit}>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">User role</label>
+              <div className="relative">
+                <UserCircleIcon size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+                <select
+                  value={role}
+                  onChange={(e) => onRoleChange(e.target.value as Role)}
+                  className="w-full appearance-none rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm font-medium text-gray-900 shadow-xs focus:border-brand-300 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+                >
+                  {roleOptions.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="mt-1.5 text-xs text-gray-500">{ROLE_META[role].description}</p>
+            </div>
 
-          {/* Credentials */}
-          <div className="mt-6 space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
               <div className="relative">
                 <Mail01Icon size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 <input
                   type="email"
-                  defaultValue="demo@kingsford.edu.gh"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm shadow-xs focus:border-brand-300 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+                  placeholder="you@kingsford.edu.gh"
                 />
               </div>
             </div>
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
               <div className="relative">
                 <SquareLock01Icon size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 <input
-                  type="password"
-                  defaultValue="password"
-                  className="w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm shadow-xs focus:border-brand-300 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-10 text-sm shadow-xs focus:border-brand-300 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+                  placeholder="Enter password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                >
+                  {showPassword ? <ViewOffSlashIcon size={18} /> : <ViewIcon size={18} />}
+                </button>
               </div>
             </div>
+
+            {error && (
+              <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2.5 text-sm text-error-700">
+                {error}
+              </div>
+            )}
+
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600">
                 <input type="checkbox" defaultChecked className="size-4 rounded border-gray-300 accent-brand-600" />
                 Remember me
               </label>
-              <button className="font-semibold text-brand-700 hover:text-brand-800">Forgot password?</button>
+              <button
+                type="button"
+                className="font-semibold text-brand-700 hover:text-brand-800"
+                onClick={() => toast("Contact the school office to reset your password.", "info")}
+              >
+                Forgot password?
+              </button>
             </div>
-            <Button size="lg" className="w-full" onClick={() => navigate(`/${selected}`)} icon={<ArrowRight01Icon size={18} />}>
-              Sign in to {portals.find((p) => p.role === selected)?.label}
+
+            <Button type="submit" size="lg" className="w-full" disabled={loading} icon={<ArrowRight01Icon size={18} />}>
+              {loading ? "Signing in…" : `Sign in as ${ROLE_META[role].shortLabel}`}
             </Button>
+          </form>
+
+          <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Demo accounts</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Password for all roles: <span className="font-semibold text-gray-800">{DEMO_PASSWORD}</span>
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-1.5">
+              {demoHints.map((d) => (
+                <button
+                  key={d.role}
+                  type="button"
+                  onClick={() => onRoleChange(d.role)}
+                  className="truncate rounded-md px-2 py-1.5 text-left text-xs font-medium text-gray-600 hover:bg-white hover:text-brand-700"
+                >
+                  {ROLE_META[d.role].shortLabel}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <p className="mt-8 text-center text-sm text-gray-500">
-            Trouble signing in? Contact the school office at <span className="font-semibold text-gray-700">030 555 0100</span>
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Accounts are created by the school admin. Help: <span className="font-semibold text-gray-700">030 555 0100</span>
           </p>
         </div>
       </div>
 
-      {/* Right — showcase */}
       <div className="relative hidden flex-1 overflow-hidden bg-brand-800 lg:block">
         <div className="absolute -top-24 -right-24 size-96 rounded-full bg-brand-600/40 blur-3xl" />
         <div className="absolute -bottom-32 -left-16 size-105 rounded-full bg-brand-500/30 blur-3xl" />
         <div className="relative flex h-full flex-col justify-center px-16 xl:px-24">
           <p className="text-sm font-semibold tracking-widest text-brand-200 uppercase">School ERP · {school.year}</p>
           <h2 className="mt-4 max-w-lg text-4xl leading-tight font-bold text-white xl:text-5xl">
-            One platform for the whole school community.
+            Eight roles. One school system.
           </h2>
           <p className="mt-5 max-w-md text-lg text-brand-100">
-            Admissions, academics, finance, communication and more — connected across administrators, teachers, students and parents.
+            Admin, Headmaster, Accountant, Teacher, Librarian, HR, Student and Parent — each with the tools they need.
           </p>
-          <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
-            {[
-              { v: "184", l: "Students enrolled" },
-              { v: "97%", l: "Fee collection rate" },
-              { v: "12+", l: "Integrated modules" },
-            ].map((s) => (
-              <div key={s.l} className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                <p className="text-2xl font-bold text-white">{s.v}</p>
-                <p className="mt-1 text-xs text-brand-200">{s.l}</p>
+          <div className="mt-10 grid max-w-md grid-cols-2 gap-3">
+            {roleOptions.slice(0, 6).map((r) => (
+              <div key={r.value} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
+                <p className="text-sm font-semibold text-white">{r.shortLabel}</p>
+                <p className="mt-0.5 line-clamp-2 text-xs text-brand-200">{r.description}</p>
               </div>
             ))}
           </div>

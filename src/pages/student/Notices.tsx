@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PageHeader, Card, Badge, Tabs } from "../../components/ui";
-import { notices, events } from "../../data/mock";
 import { formatDate } from "../../lib/utils";
+import { useAppStore } from "../../store/AppStore";
 
 const tagTone = { Event: "brand", Academic: "blue", Finance: "warning", General: "gray" } as const;
 
 export default function StudentNotices() {
+  const { notices, events } = useAppStore();
   const [tab, setTab] = useState("All");
-  const filtered = tab === "All" ? notices : notices.filter((n) => n.tag === tab);
+
+  const portalNotices = useMemo(
+    () => notices.filter((n) => n.audience === "Everyone" || n.audience === "Students"),
+    [notices],
+  );
+
+  const filtered = tab === "All" ? portalNotices : portalNotices.filter((n) => n.tag === tab);
 
   return (
     <div>
@@ -19,16 +26,20 @@ export default function StudentNotices() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="space-y-5 xl:col-span-2">
-          {filtered.map((n) => (
-            <Card key={n.id} className="p-5 transition-shadow hover:shadow-md">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={tagTone[n.tag]}>{n.tag}</Badge>
-                <span className="text-xs text-gray-400">{formatDate(n.date)} · for {n.audience}</span>
-              </div>
-              <h3 className="mt-2.5 text-base font-bold text-gray-900">{n.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{n.body}</p>
-            </Card>
-          ))}
+          {filtered.length === 0 ? (
+            <Card className="p-6 text-sm text-gray-500">No notices for students at the moment.</Card>
+          ) : (
+            filtered.map((n) => (
+              <Card key={n.id} className="p-5 transition-shadow hover:shadow-md">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone={tagTone[n.tag]}>{n.tag}</Badge>
+                  <span className="text-xs text-gray-400">{formatDate(n.date)} · for {n.audience}</span>
+                </div>
+                <h3 className="mt-2.5 text-base font-bold text-gray-900">{n.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{n.body}</p>
+              </Card>
+            ))
+          )}
         </div>
 
         <Card className="h-fit">

@@ -1,105 +1,180 @@
+import { useMemo } from "react";
 import { Pdf01Icon, SmartPhone01Icon, BankIcon, Wallet01Icon } from "hugeicons-react";
 import { PageHeader, Card, CardHeader, Badge, statusTone, Button, Table, THead, TRow, TCell, StatCard, Select } from "../../components/ui";
-import { formatMoney, cn } from "../../lib/utils";
-
-const familyInvoices = [
-  { id: "INV-1041", child: "Abena Osei", item: "Term 3 Tuition", amount: 1850, paid: 1850, status: "Paid" },
-  { id: "INV-1102", child: "Kwaku Osei", item: "Term 3 Tuition (Primary)", amount: 1450, paid: 1200, status: "Partial" },
-  { id: "INV-1103", child: "Kwaku Osei", item: "Bus Fee — Term 3", amount: 300, paid: 300, status: "Paid" },
-  { id: "INV-0987", child: "Abena Osei", item: "Term 2 Tuition", amount: 1850, paid: 1850, status: "Paid" },
-];
-
-const history = [
-  { id: "PAY-2211", desc: "Term 3 Tuition — Abena", amount: 1850, method: "MoMo", date: "10 May 2026" },
-  { id: "PAY-2190", desc: "Term 3 Tuition — Kwaku (part)", amount: 1200, method: "Bank", date: "14 May 2026" },
-  { id: "PAY-2101", desc: "Bus Fee — Kwaku", amount: 300, method: "MoMo", date: "20 May 2026" },
-];
+import { formatMoney, formatDate, cn } from "../../lib/utils";
+import { useToast } from "../../components/Toast";
+import { useAppStore } from "../../store/AppStore";
+import { useParentChildren } from "../../hooks/usePortalIdentity";
 
 export default function ParentFees() {
+  const { toast } = useToast();
+  const { children, selectedId, setSelectedId, filterChildren } = useParentChildren();
+  const { invoices, payments, recordPayment } = useAppStore();
+
+  const childNames = useMemo(() => new Set(filterChildren.map((c) => c.name)), [filterChildren]);
+
+  const familyInvoices = useMemo(
+    () => invoices.filter((inv) => childNames.has(inv.student)),
+    [invoices, childNames],
+  );
+  const familyPayments = useMemo(
+    () => payments.filter((p) => childNames.has(p.student)),
+    [payments, childNames],
+  );
+
+  const outstanding = familyInvoices.reduce((sum, inv) => sum + Math.max(0, inv.amount - inv.paid), 0);
+  const paidThisYear = familyPayments.reduce((sum, p) => sum + p.amount, 0);
+  const nextDue = [...familyInvoices]
+    .filter((inv) => inv.amount > inv.paid)
+    .sort((a, b) => a.due.localeCompare(b.due))[0];
+
+  const outstandingInvoice = familyInvoices.find((inv) => inv.amount > inv.paid);
+
+  const pay = (method: "MoMo" | "Bank") => {
+    if (!outstandingInvoice || outstanding <= 0) {
+      toast("No outstanding balance to pay", "error");
+      return;
+    }
+    const amount = Math.min(outstanding, outstandingInvoice.amount - outstandingInvoice.paid);
+    recordPayment(
+      {
+        student: outstandingInvoice.student,
+        amount,
+        method,
+        date: new Date().toISOString().slice(0, 10),
+        ref: method === "MoMo" ? `MM-${Date.now().toString().slice(-8)}` : `GCB-${Date.now().toString().slice(-7)}`,
+      },
+      outstandingInvoice.id,
+    );
+    toast(`${method === "MoMo" ? "MTN MoMo" : "Bank transfer"} payment of ${formatMoney(amount)} recorded.`);
+  };
+
+  const childOptions = ["All children", ...children.map((c) => c.name)];
+
   return (
     <div>
       <PageHeader
         title="Fees & Payments"
         subtitle="Family invoices across all linked children."
-        actions={<Select options={["All children", "Abena Osei", "Kwaku Osei"]} />}
+        actions={
+          <Select
+            options={childOptions}
+            value={selectedId === "all" ? "All children" : children.find((c) => c.id === selectedId)?.name ?? "All children"}
+            onChange={(v) => {
+              if (v === "All children") setSelectedId("all");
+              else setSelectedId(children.find((c) => c.name === v)?.id ?? "all");
+            }}
+          />
+        }
       />
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <StatCard label="Outstanding balance" value={formatMoney(250)} delta="1 partial invoice" deltaLabel="" positive={false} icon={<Wallet01Icon size={20} />} iconBg="bg-error-50 text-error-600" />
-        <StatCard label="Paid this year" value={formatMoney(9250)} delta="on time" deltaLabel="every term" iconBg="bg-success-50 text-success-600" />
-        <StatCard label="Next due date" value="15 Jul" delta="extended deadline" deltaLabel="" iconBg="bg-warning-50 text-warning-600" />
-      </div>
-
-      {/* Pay now */}
-      <Card className="mt-6 border-brand-200 bg-brand-25">
-        <div className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div>
-            <p className="text-base font-bold text-gray-900">Pay outstanding balance — {formatMoney(250)}</p>
-            <p className="mt-0.5 text-sm text-gray-600">Kwaku's Term 3 tuition balance. Choose a payment method below.</p>
+      {children.length === 0 ? (
+        <Card className="p-6 text-sm text-gray-600">No students linked to this parent account.</Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <StatCard label="Outstanding balance" value={formatMoney(outstanding)} delta={outstanding > 0 ? "balance due" : "all clear"} deltaLabel="" positive={outstanding === 0} icon={<Wallet01Icon size={20} />} iconBg={outstanding > 0 ? "bg-error-50 text-error-600" : "bg-success-50 text-success-600"} />
+            <StatCard label="Paid this year" value={formatMoney(paidThisYear)} delta={`${familyPayments.length} payments`} deltaLabel="" iconBg="bg-success-50 text-success-600" />
+            <StatCard label="Next due date" value={nextDue ? formatDate(nextDue.due).split(" ").slice(0, 2).join(" ") : "—"} delta={nextDue?.item ?? "no dues"} deltaLabel="" iconBg="bg-warning-50 text-warning-600" />
           </div>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: "MTN MoMo", icon: SmartPhone01Icon, primary: true },
-              { label: "Bank transfer", icon: BankIcon, primary: false },
-            ].map((m) => (
-              <button
-                key={m.label}
-                className={cn(
-                  "flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-xs transition-colors",
-                  m.primary ? "bg-brand-600 text-white hover:bg-brand-700" : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
-                )}
-              >
-                <m.icon size={18} /> {m.label}
-              </button>
-            ))}
+
+          {outstanding > 0 && outstandingInvoice && (
+            <Card className="mt-6 border-brand-200 bg-brand-25">
+              <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+                <div>
+                  <p className="text-base font-bold text-gray-900">Pay outstanding balance — {formatMoney(outstanding)}</p>
+                  <p className="mt-0.5 text-sm text-gray-600">
+                    {outstandingInvoice.student}'s {outstandingInvoice.item}. Choose a payment method below.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    { label: "MTN MoMo", icon: SmartPhone01Icon, primary: true, method: "MoMo" as const },
+                    { label: "Bank transfer", icon: BankIcon, primary: false, method: "Bank" as const },
+                  ].map((m) => (
+                    <button
+                      key={m.label}
+                      type="button"
+                      onClick={() => pay(m.method)}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-xs transition-colors",
+                        m.primary ? "bg-brand-600 text-white hover:bg-brand-700" : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
+                      )}
+                    >
+                      <m.icon size={18} /> {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <Card>
+              <CardHeader title="Invoices" subtitle="2025/26 academic year" />
+              {familyInvoices.length === 0 ? (
+                <p className="px-5 pb-5 text-sm text-gray-500">No invoices for selected children.</p>
+              ) : (
+                <Table>
+                  <THead cols={["Invoice", "Child", "Amount", "Status"]} />
+                  <tbody>
+                    {familyInvoices.map((inv) => (
+                      <TRow key={inv.id}>
+                        <TCell>
+                          <p className="font-semibold text-gray-900">{inv.item}</p>
+                          <p className="text-xs text-gray-400">{inv.id}</p>
+                        </TCell>
+                        <TCell>{inv.student}</TCell>
+                        <TCell>
+                          <p className="font-semibold text-gray-900">{formatMoney(inv.amount)}</p>
+                          {inv.paid < inv.amount && <p className="text-xs text-error-600">Bal: {formatMoney(inv.amount - inv.paid)}</p>}
+                        </TCell>
+                        <TCell><Badge tone={statusTone(inv.status)} dot>{inv.status}</Badge></TCell>
+                      </TRow>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </Card>
+
+            <Card>
+              <CardHeader
+                title="Payment history"
+                subtitle="Receipts & statements"
+                action={
+                  <Button variant="secondary" size="sm" icon={<Pdf01Icon size={16} />} onClick={() => toast("Downloading family statement (demo)…", "info")}>
+                    Statement
+                  </Button>
+                }
+              />
+              {familyPayments.length === 0 ? (
+                <p className="px-5 pb-5 text-sm text-gray-500">No payments recorded yet.</p>
+              ) : (
+                <Table>
+                  <THead cols={["Payment", "Amount", "Method", "Receipt"]} />
+                  <tbody>
+                    {familyPayments.map((p) => (
+                      <TRow key={p.id}>
+                        <TCell>
+                          <p className="font-semibold text-gray-900">{p.student}</p>
+                          <p className="text-xs text-gray-400">{formatDate(p.date)} · {p.ref}</p>
+                        </TCell>
+                        <TCell className="font-semibold text-success-700">{formatMoney(p.amount)}</TCell>
+                        <TCell><Badge tone={p.method === "MoMo" ? "warning" : "blue"}>{p.method}</Badge></TCell>
+                        <TCell>
+                          <Button variant="secondary" size="sm" icon={<Pdf01Icon size={16} />} onClick={() => toast(`Downloading receipt ${p.id} (demo)…`, "info")}>
+                            PDF
+                          </Button>
+                        </TCell>
+                      </TRow>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </Card>
           </div>
-        </div>
-      </Card>
-
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Card>
-          <CardHeader title="Invoices" subtitle="2025/26 academic year — both children" />
-          <Table>
-            <THead cols={["Invoice", "Child", "Amount", "Status"]} />
-            <tbody>
-              {familyInvoices.map((inv) => (
-                <TRow key={inv.id}>
-                  <TCell>
-                    <p className="font-semibold text-gray-900">{inv.item}</p>
-                    <p className="text-xs text-gray-400">{inv.id}</p>
-                  </TCell>
-                  <TCell>{inv.child}</TCell>
-                  <TCell>
-                    <p className="font-semibold text-gray-900">{formatMoney(inv.amount)}</p>
-                    {inv.paid < inv.amount && <p className="text-xs text-error-600">Bal: {formatMoney(inv.amount - inv.paid)}</p>}
-                  </TCell>
-                  <TCell><Badge tone={statusTone(inv.status)} dot>{inv.status}</Badge></TCell>
-                </TRow>
-              ))}
-            </tbody>
-          </Table>
-        </Card>
-
-        <Card>
-          <CardHeader title="Payment history" subtitle="Receipts & statements" action={<Button variant="secondary" size="sm" icon={<Pdf01Icon size={16} />}>Statement</Button>} />
-          <Table>
-            <THead cols={["Payment", "Amount", "Method", "Receipt"]} />
-            <tbody>
-              {history.map((p) => (
-                <TRow key={p.id}>
-                  <TCell>
-                    <p className="font-semibold text-gray-900">{p.desc}</p>
-                    <p className="text-xs text-gray-400">{p.date}</p>
-                  </TCell>
-                  <TCell className="font-semibold text-success-700">{formatMoney(p.amount)}</TCell>
-                  <TCell><Badge tone={p.method === "MoMo" ? "warning" : "blue"}>{p.method}</Badge></TCell>
-                  <TCell><Button variant="secondary" size="sm" icon={<Pdf01Icon size={16} />}>PDF</Button></TCell>
-                </TRow>
-              ))}
-            </tbody>
-          </Table>
-        </Card>
-      </div>
+        </>
+      )}
     </div>
   );
 }

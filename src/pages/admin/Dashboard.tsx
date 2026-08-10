@@ -8,21 +8,28 @@ import {
 } from "hugeicons-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, Legend } from "recharts";
 import { PageHeader, StatCard, Card, CardHeader, Badge, statusTone, Button, Avatar, Table, THead, TRow, TCell } from "../../components/ui";
-import { revenueByMonth, enrollmentByClass, auditLog, events, invoices, currentUsers } from "../../data/mock";
+import { revenueByMonth, enrollmentByClass, auditLog, events } from "../../data/mock";
 import { formatDate, formatMoney } from "../../lib/utils";
+import { useAuth } from "../../auth/AuthContext";
+import { useAppStore } from "../../store/AppStore";
+import { useToast } from "../../components/Toast";
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
+  const { invoices } = useAppStore();
+  const { toast } = useToast();
   const outstanding = invoices.filter((i) => i.status !== "Paid");
+  const firstName = user?.name.split(" ")[1] || user?.name.split(" ")[0] || "Admin";
 
   return (
     <div>
       <PageHeader
-        title={`Good afternoon, ${currentUsers.admin.name.split(" ")[1]} 👋`}
+        title={`Good afternoon, ${firstName} 👋`}
         subtitle="Here's what's happening across Kingsford Academy today."
         actions={
           <>
-            <Button variant="secondary" icon={<Calendar03Icon size={18} />}>View calendar</Button>
-            <Button icon={<ArrowRight01Icon size={18} />}>Generate term report</Button>
+            <Button variant="secondary" icon={<Calendar03Icon size={18} />} onClick={() => toast("Opening school calendar…", "info")}>View calendar</Button>
+            <Button icon={<ArrowRight01Icon size={18} />} onClick={() => toast("Term report generation started (demo).", "info")}>Generate term report</Button>
           </>
         }
       />

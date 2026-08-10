@@ -1,50 +1,86 @@
+import { useMemo } from "react";
 import { Pdf01Icon, Award01Icon } from "hugeicons-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { PageHeader, Card, CardHeader, Badge, Button, Table, THead, TRow, TCell, Select, StatCard } from "../../components/ui";
-import { grades, gpaTrend } from "../../data/mock";
+import { gpaTrend } from "../../data/mock";
+import { useAppStore } from "../../store/AppStore";
+import { useCurrentStudent } from "../../hooks/usePortalIdentity";
+import { useToast } from "../../components/Toast";
 
 export default function StudentResults() {
+  const student = useCurrentStudent();
+  const { grades } = useAppStore();
+  const { toast } = useToast();
+
+  const myGrades = useMemo(
+    () => (student ? grades.filter((g) => g.studentId === student.id && g.status === "Approved") : []),
+    [grades, student],
+  );
+
+  const avgScore = myGrades.length ? (myGrades.reduce((a, g) => a + g.total, 0) / myGrades.length).toFixed(1) : "—";
+  const best = myGrades.length ? [...myGrades].sort((a, b) => b.total - a.total)[0] : null;
+  const weakest = myGrades.length ? [...myGrades].sort((a, b) => a.total - b.total)[0] : null;
+
+  if (!student) {
+    return (
+      <div>
+        <PageHeader title="My Academic Results" subtitle="Grades, GPA and report cards." />
+        <Card className="p-6 text-sm text-gray-600">No student profile linked to this account.</Card>
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader
         title="My Academic Results"
-        subtitle="Grades, GPA and report cards — Abena Osei, JHS 2A."
+        subtitle={`Grades, GPA and report cards — ${student.name}, ${student.class}.`}
         actions={
           <>
             <Select options={["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"]} />
-            <Button variant="secondary" icon={<Pdf01Icon size={18} />}>Download report card</Button>
+            <Button
+              variant="secondary"
+              icon={<Pdf01Icon size={18} />}
+              onClick={() => toast("Downloading report card (demo)…", "info")}
+            >
+              Download report card
+            </Button>
           </>
         }
       />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Term GPA" value="3.8" delta="0.2" />
-        <StatCard label="Class rank" value="2nd" delta="of 34 students" deltaLabel="" icon={<Award01Icon size={20} />} iconBg="bg-warning-50 text-warning-600" />
-        <StatCard label="Subject rank (best)" value="1st" delta="ICT" deltaLabel="" iconBg="bg-success-50 text-success-600" />
-        <StatCard label="Average score" value="78.5%" delta="3.4%" iconBg="bg-blue-50 text-blue-600" />
+        <StatCard label="Term GPA" value={student.gpa.toFixed(1)} delta="this term" />
+        <StatCard label="Class" value={student.class} delta={student.id} deltaLabel="" icon={<Award01Icon size={20} />} iconBg="bg-warning-50 text-warning-600" />
+        <StatCard label="Strongest subject" value={best?.subject ?? "—"} delta={best ? `${best.total}%` : ""} deltaLabel="" iconBg="bg-success-50 text-success-600" />
+        <StatCard label="Average score" value={avgScore !== "—" ? `${avgScore}%` : "—"} delta={weakest ? `focus: ${weakest.subject}` : ""} iconBg="bg-blue-50 text-blue-600" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader title="Term 3 results" subtitle="Continuous assessment (40%) + exam (60%)" action={<Badge tone="success" dot>Published</Badge>} />
-          <Table>
-            <THead cols={["Subject", "Test 1 /20", "Test 2 /20", "Exam /60", "Total", "Grade", "Remark"]} />
-            <tbody>
-              {grades.map((g) => (
-                <TRow key={g.subject}>
-                  <TCell className="font-semibold text-gray-900">{g.subject}</TCell>
-                  <TCell>{g.test1}</TCell>
-                  <TCell>{g.test2}</TCell>
-                  <TCell>{g.exam}</TCell>
-                  <TCell className="text-base font-bold text-gray-900">{g.total}%</TCell>
-                  <TCell>
-                    <Badge tone={g.grade.startsWith("A") ? "success" : g.grade.startsWith("B") ? "blue" : "warning"}>{g.grade}</Badge>
-                  </TCell>
-                  <TCell>{g.remark}</TCell>
-                </TRow>
-              ))}
-            </tbody>
-          </Table>
+          {myGrades.length === 0 ? (
+            <p className="px-5 pb-5 text-sm text-gray-500">No published grades yet for your class.</p>
+          ) : (
+            <Table>
+              <THead cols={["Subject", "Test 1 /20", "Test 2 /20", "Exam /60", "Total", "Grade", "Remark"]} />
+              <tbody>
+                {myGrades.map((g) => (
+                  <TRow key={g.id}>
+                    <TCell className="font-semibold text-gray-900">{g.subject}</TCell>
+                    <TCell>{g.test1}</TCell>
+                    <TCell>{g.test2}</TCell>
+                    <TCell>{g.exam}</TCell>
+                    <TCell className="text-base font-bold text-gray-900">{g.total}%</TCell>
+                    <TCell>
+                      <Badge tone={g.grade.startsWith("A") ? "success" : g.grade.startsWith("B") ? "blue" : "warning"}>{g.grade}</Badge>
+                    </TCell>
+                    <TCell>{g.remark}</TCell>
+                  </TRow>
+                ))}
+              </tbody>
+            </Table>
+          )}
         </Card>
 
         <div className="space-y-6">
@@ -72,7 +108,14 @@ export default function StudentResults() {
                     <p className="text-sm font-semibold text-gray-900">{t}</p>
                     <p className="text-xs text-gray-400">Result slip · PDF</p>
                   </div>
-                  <Button variant="secondary" size="sm" icon={<Pdf01Icon size={16} />}>Download</Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<Pdf01Icon size={16} />}
+                    onClick={() => toast(`Downloading ${t} report (demo)…`, "info")}
+                  >
+                    Download
+                  </Button>
                 </div>
               ))}
             </div>

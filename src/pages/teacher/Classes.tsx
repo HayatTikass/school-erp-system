@@ -1,20 +1,49 @@
+import { useMemo, useState } from "react";
 import { UserMultipleIcon, Door01Icon, NoteIcon } from "hugeicons-react";
 import { PageHeader, Card, CardHeader, Badge, statusTone, Avatar, Table, THead, TRow, TCell, SearchInput, Select, Progress, attendanceTone, Button } from "../../components/ui";
-import { students, classes } from "../../data/mock";
+import { useAppStore } from "../../store/AppStore";
+import { useToast } from "../../components/Toast";
+
+const ROSTER_OPTIONS = ["JHS 2A & 2B", "JHS 2A", "JHS 2B", "JHS 3A", "JHS 1A"];
 
 export default function TeacherClasses() {
-  const roster = students.filter((s) => s.class.startsWith("JHS 2"));
+  const { toast } = useToast();
+  const { students, classes } = useAppStore();
+  const [search, setSearch] = useState("");
+  const [rosterFilter, setRosterFilter] = useState(ROSTER_OPTIONS[0]);
+
+  const teacherClasses = classes.slice(0, 4);
+
+  const roster = useMemo(() => {
+    let list = students;
+    if (rosterFilter === "JHS 2A & 2B") {
+      list = students.filter((s) => s.class === "JHS 2A" || s.class === "JHS 2B");
+    } else {
+      list = students.filter((s) => s.class === rosterFilter);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (s) => s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q) || s.guardian.toLowerCase().includes(q),
+      );
+    }
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  }, [students, rosterFilter, search]);
 
   return (
     <div>
       <PageHeader
         title="My Classes"
         subtitle="Rosters, profiles and class notes for your assigned classes."
-        actions={<Button variant="secondary" icon={<NoteIcon size={18} />}>Class notes</Button>}
+        actions={
+          <Button variant="secondary" icon={<NoteIcon size={18} />} onClick={() => toast("Class notes saved locally", "info")}>
+            Class notes
+          </Button>
+        }
       />
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {classes.slice(0, 4).map((c) => (
+        {teacherClasses.map((c) => (
           <Card key={c.id} className="p-5">
             <div className="flex items-start justify-between">
               <div className="flex size-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
@@ -23,7 +52,9 @@ export default function TeacherClasses() {
               {c.name === "JHS 2A" && <Badge tone="brand">Class teacher</Badge>}
             </div>
             <h3 className="mt-3 text-lg font-bold text-gray-900">{c.name}</h3>
-            <p className="text-sm text-gray-500">{c.students} students · Mathematics</p>
+            <p className="text-sm text-gray-500">
+              {students.filter((s) => s.class === c.name).length} students · Mathematics
+            </p>
             <p className="mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3 text-sm text-gray-500">
               <Door01Icon size={16} /> {c.room}
             </p>
@@ -32,10 +63,10 @@ export default function TeacherClasses() {
       </div>
 
       <Card className="mt-6">
-        <CardHeader title="JHS 2A & 2B roster" subtitle={`${roster.length} students shown`} />
+        <CardHeader title={`${rosterFilter} roster`} subtitle={`${roster.length} students shown`} />
         <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-5 py-3.5">
-          <SearchInput placeholder="Search students…" className="w-72" />
-          <Select options={["JHS 2A & 2B", "JHS 2A", "JHS 2B"]} />
+          <SearchInput placeholder="Search students…" className="w-72" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Select options={ROSTER_OPTIONS} value={rosterFilter} onChange={setRosterFilter} />
         </div>
         <Table>
           <THead cols={["Student", "ID", "Class", "Attendance", "Current GPA", "Status"]} />
@@ -60,7 +91,11 @@ export default function TeacherClasses() {
                   </div>
                 </TCell>
                 <TCell className="font-semibold text-gray-900">{s.gpa.toFixed(1)}</TCell>
-                <TCell><Badge tone={statusTone(s.status)} dot>{s.status}</Badge></TCell>
+                <TCell>
+                  <Badge tone={statusTone(s.status)} dot>
+                    {s.status}
+                  </Badge>
+                </TCell>
               </TRow>
             ))}
           </tbody>

@@ -1,33 +1,101 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckmarkCircle02Icon, CancelCircleIcon, Clock01Icon, TickDouble01Icon } from "hugeicons-react";
 import { PageHeader, Card, CardHeader, Badge, Button, Avatar, Select, StatCard } from "../../components/ui";
-import { students } from "../../data/mock";
 import { cn } from "../../lib/utils";
+import { useToast } from "../../components/Toast";
+import { useAppStore } from "../../store/AppStore";
+import { useAuth } from "../../auth/AuthContext";
+import type { AttendanceMark } from "../../store/domain";
+
+const CLASS_OPTIONS = [
+  "JHS 2A — Mathematics",
+  "JHS 2B — Mathematics",
+  "JHS 3A — Mathematics",
+  "JHS 1A — Mathematics",
+];
 
 type Mark = "present" | "absent" | "late";
 
+function parseClass(option: string) {
+  return option.split(" — ")[0]?.trim() ?? option;
+}
+
+function todayLabel() {
+  return new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
 export default function TeacherAttendance() {
-  const roster = students.filter((s) => s.class === "JHS 2A").concat(students.slice(0, 4));
-  const [marks, setMarks] = useState<Record<string, Mark>>(
-    Object.fromEntries(roster.map((s, i) => [s.id + i, i === 3 ? "absent" : i === 5 ? "late" : "present"])),
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { students, attendance, submitAttendance } = useAppStore();
+  const today = new Date().toISOString().slice(0, 10);
+
+  const [classOption, setClassOption] = useState(CLASS_OPTIONS[0]);
+  const className = parseClass(classOption);
+
+  const roster = useMemo(
+    () => students.filter((s) => s.class === className).sort((a, b) => a.name.localeCompare(b.name)),
+    [students, className],
   );
+
+  const [marks, setMarks] = useState<Record<string, Mark>>({});
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    const existing = attendance.filter((a) => a.date === today && a.className === className);
+    if (existing.length) {
+      setMarks(
+        Object.fromEntries(
+          existing.map((a) => [a.studentId, a.mark === "excused" ? "present" : (a.mark as Mark)]),
+        ),
+      );
+      setDirty(false);
+    } else {
+      setMarks(Object.fromEntries(roster.map((s) => [s.id, "present" as Mark])));
+      setDirty(false);
+    }
+  }, [className, roster, attendance, today]);
 
   const counts = Object.values(marks).reduce(
     (acc, m) => ({ ...acc, [m]: (acc[m] ?? 0) + 1 }),
     {} as Record<Mark, number>,
   );
 
-  const setAll = (m: Mark) => setMarks(Object.fromEntries(Object.keys(marks).map((k) => [k, m])));
+  const setAll = (m: Mark) => {
+    setMarks(Object.fromEntries(roster.map((s) => [s.id, m])));
+    setDirty(true);
+  };
+
+  const setMark = (studentId: string, m: Mark) => {
+    setMarks((prev) => ({ ...prev, [studentId]: m }));
+    setDirty(true);
+  };
+
+  const handleSubmit = () => {
+    const payload = roster.map((s) => ({
+      studentId: s.id,
+      studentName: s.name,
+      mark: (marks[s.id] ?? "present") as AttendanceMark,
+    }));
+    submitAttendance(className, today, payload, user?.name);
+    setDirty(false);
+    toast(
+      `Register submitted — ${counts.present ?? 0} present, ${counts.absent ?? 0} absent, ${counts.late ?? 0} late`,
+      "success",
+    );
+  };
 
   return (
     <div>
       <PageHeader
         title="Attendance Tracking"
-        subtitle="Mark today's register — Monday, 6 July 2026."
+        subtitle={`Mark today's register — ${todayLabel()}.`}
         actions={
           <>
-            <Select options={["JHS 2A — Mathematics", "JHS 2B — Mathematics", "JHS 3A — Mathematics", "JHS 1A — Mathematics"]} />
-            <Button icon={<TickDouble01Icon size={18} />} onClick={() => setAll("present")}>Mark all present</Button>
+            <Select options={CLASS_OPTIONS} value={classOption} onChange={setClassOption} />
+            <Button icon={<TickDouble01Icon size={18} />} onClick={() => setAll("present")}>
+              Mark all present
+            </Button>
           </>
         }
       />
@@ -40,16 +108,15 @@ export default function TeacherAttendance() {
 
       <Card className="mt-6">
         <CardHeader
-          title="JHS 2A register"
+          title={`${className} register`}
           subtitle={`${roster.length} students · period 1 (7:30 – 8:50)`}
-          action={<Badge tone="brand" dot>Unsaved changes</Badge>}
+          action={dirty ? <Badge tone="brand" dot>Unsaved changes</Badge> : <Badge tone="success" dot>Saved</Badge>}
         />
         <div className="divide-y divide-gray-100">
-          {roster.map((s, i) => {
-            const key = s.id + i;
-            const mark = marks[key];
+          {roster.map((s) => {
+            const mark = marks[s.id] ?? "present";
             return (
-              <div key={key} className="flex flex-wrap items-center gap-4 px-5 py-3.5">
+              <div key={s.id} className="flex flex-wrap items-center gap-4 px-5 py-3.5">
                 <Avatar name={s.name} color={s.avatarColor} size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-gray-900">{s.name}</p>
@@ -60,7 +127,8 @@ export default function TeacherAttendance() {
                   {(["present", "late", "absent"] as Mark[]).map((m) => (
                     <button
                       key={m}
-                      onClick={() => setMarks({ ...marks, [key]: m })}
+                      type="button"
+                      onClick={() => setMark(s.id, m)}
                       className={cn(
                         "rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-colors",
                         mark === m
@@ -79,10 +147,17 @@ export default function TeacherAttendance() {
               </div>
             );
           })}
+          {roster.length === 0 && (
+            <p className="px-5 py-8 text-center text-sm text-gray-500">No students found for {className}.</p>
+          )}
         </div>
         <div className="flex justify-end gap-3 border-t border-gray-200 px-5 py-4">
-          <Button variant="secondary">Save draft</Button>
-          <Button>Submit register</Button>
+          <Button variant="secondary" onClick={() => toast("Attendance draft saved", "info")}>
+            Save draft
+          </Button>
+          <Button onClick={handleSubmit} disabled={roster.length === 0}>
+            Submit register
+          </Button>
         </div>
       </Card>
     </div>

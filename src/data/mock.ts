@@ -14,8 +14,11 @@ export const school = {
 export type Student = {
   id: string;
   name: string;
+  email: string;
   class: string;
   gender: "M" | "F";
+  /** Parent/guardian system user id */
+  parentId: string;
   guardian: string;
   status: "Active" | "Suspended" | "Archived";
   attendance: number; // %
@@ -25,18 +28,19 @@ export type Student = {
 };
 
 export const students: Student[] = [
-  { id: "KA-2401", name: "Abena Osei", class: "JHS 2A", gender: "F", guardian: "Kwame Osei", status: "Active", attendance: 96, gpa: 3.8, feesOwed: 0, avatarColor: "bg-brand-100 text-brand-700" },
-  { id: "KA-2402", name: "Kojo Mensah", class: "JHS 2A", gender: "M", guardian: "Ama Mensah", status: "Active", attendance: 89, gpa: 3.2, feesOwed: 450, avatarColor: "bg-blue-100 text-blue-700" },
-  { id: "KA-2403", name: "Efua Boateng", class: "JHS 2A", gender: "F", guardian: "Yaw Boateng", status: "Active", attendance: 98, gpa: 3.9, feesOwed: 0, avatarColor: "bg-pink-100 text-pink-700" },
-  { id: "KA-2404", name: "Kwabena Asante", class: "JHS 2B", gender: "M", guardian: "Akosua Asante", status: "Active", attendance: 74, gpa: 2.6, feesOwed: 1200, avatarColor: "bg-orange-100 text-orange-700" },
-  { id: "KA-2405", name: "Adwoa Owusu", class: "JHS 2B", gender: "F", guardian: "Kofi Owusu", status: "Active", attendance: 92, gpa: 3.5, feesOwed: 300, avatarColor: "bg-success-100 text-success-700" },
-  { id: "KA-2406", name: "Yaw Darko", class: "JHS 1A", gender: "M", guardian: "Esi Darko", status: "Active", attendance: 85, gpa: 3.0, feesOwed: 800, avatarColor: "bg-indigo-100 text-indigo-700" },
-  { id: "KA-2407", name: "Akua Frimpong", class: "JHS 1A", gender: "F", guardian: "Kwesi Frimpong", status: "Active", attendance: 94, gpa: 3.7, feesOwed: 0, avatarColor: "bg-cyan-100 text-cyan-700" },
-  { id: "KA-2408", name: "Kofi Adjei", class: "JHS 3A", gender: "M", guardian: "Abena Adjei", status: "Suspended", attendance: 61, gpa: 2.1, feesOwed: 2150, avatarColor: "bg-error-100 text-error-700" },
-  { id: "KA-2409", name: "Esi Amoah", class: "JHS 3A", gender: "F", guardian: "Kojo Amoah", status: "Active", attendance: 97, gpa: 4.0, feesOwed: 0, avatarColor: "bg-brand-100 text-brand-700" },
-  { id: "KA-2410", name: "Kwame Appiah", class: "JHS 3B", gender: "M", guardian: "Adwoa Appiah", status: "Active", attendance: 88, gpa: 3.1, feesOwed: 650, avatarColor: "bg-warning-100 text-warning-700" },
-  { id: "KA-2411", name: "Ama Sarpong", class: "JHS 1B", gender: "F", guardian: "Yaw Sarpong", status: "Active", attendance: 91, gpa: 3.4, feesOwed: 150, avatarColor: "bg-blue-100 text-blue-700" },
-  { id: "KA-2412", name: "Nana Yeboah", class: "JHS 2A", gender: "M", guardian: "Efua Yeboah", status: "Active", attendance: 79, gpa: 2.8, feesOwed: 980, avatarColor: "bg-pink-100 text-pink-700" },
+  { id: "KA-2401", name: "Abena Osei", email: "abena.osei@kingsford.edu.gh", class: "JHS 2A", gender: "F", parentId: "USR-P01", guardian: "Kwame Osei", status: "Active", attendance: 96, gpa: 3.8, feesOwed: 0, avatarColor: "bg-brand-100 text-brand-700" },
+  { id: "KA-2402", name: "Kojo Mensah", email: "kojo.mensah@kingsford.edu.gh", class: "JHS 2A", gender: "M", parentId: "USR-P02", guardian: "Ama Mensah", status: "Active", attendance: 89, gpa: 3.2, feesOwed: 450, avatarColor: "bg-blue-100 text-blue-700" },
+  { id: "KA-2403", name: "Efua Boateng", email: "efua.boateng@kingsford.edu.gh", class: "JHS 2A", gender: "F", parentId: "USR-P03", guardian: "Yaw Boateng", status: "Active", attendance: 98, gpa: 3.9, feesOwed: 0, avatarColor: "bg-pink-100 text-pink-700" },
+  { id: "KA-2404", name: "Kwabena Asante", email: "kwabena.asante@kingsford.edu.gh", class: "JHS 2B", gender: "M", parentId: "USR-P04", guardian: "Akosua Asante", status: "Active", attendance: 74, gpa: 2.6, feesOwed: 1200, avatarColor: "bg-orange-100 text-orange-700" },
+  { id: "KA-2405", name: "Adwoa Owusu", email: "adwoa.owusu@kingsford.edu.gh", class: "JHS 2B", gender: "F", parentId: "USR-P05", guardian: "Kofi Owusu", status: "Active", attendance: 92, gpa: 3.5, feesOwed: 300, avatarColor: "bg-success-100 text-success-700" },
+  { id: "KA-2406", name: "Yaw Darko", email: "yaw.darko@kingsford.edu.gh", class: "JHS 1A", gender: "M", parentId: "USR-P06", guardian: "Esi Darko", status: "Active", attendance: 85, gpa: 3.0, feesOwed: 800, avatarColor: "bg-indigo-100 text-indigo-700" },
+  { id: "KA-2407", name: "Akua Frimpong", email: "akua.frimpong@kingsford.edu.gh", class: "JHS 1A", gender: "F", parentId: "USR-P07", guardian: "Kwesi Frimpong", status: "Active", attendance: 94, gpa: 3.7, feesOwed: 0, avatarColor: "bg-cyan-100 text-cyan-700" },
+  { id: "KA-2408", name: "Kofi Adjei", email: "kofi.adjei@kingsford.edu.gh", class: "JHS 3A", gender: "M", parentId: "USR-P08", guardian: "Abena Adjei", status: "Suspended", attendance: 61, gpa: 2.1, feesOwed: 2150, avatarColor: "bg-error-100 text-error-700" },
+  { id: "KA-2409", name: "Esi Amoah", email: "esi.amoah@kingsford.edu.gh", class: "JHS 3A", gender: "F", parentId: "USR-P09", guardian: "Kojo Amoah", status: "Active", attendance: 97, gpa: 4.0, feesOwed: 0, avatarColor: "bg-brand-100 text-brand-700" },
+  { id: "KA-2410", name: "Kwame Appiah", email: "kwame.appiah@kingsford.edu.gh", class: "JHS 3B", gender: "M", parentId: "USR-P10", guardian: "Adwoa Appiah", status: "Active", attendance: 88, gpa: 3.1, feesOwed: 650, avatarColor: "bg-warning-100 text-warning-700" },
+  { id: "KA-2411", name: "Ama Sarpong", email: "ama.sarpong@kingsford.edu.gh", class: "JHS 1B", gender: "F", parentId: "USR-P11", guardian: "Yaw Sarpong", status: "Active", attendance: 91, gpa: 3.4, feesOwed: 150, avatarColor: "bg-blue-100 text-blue-700" },
+  { id: "KA-2412", name: "Nana Yeboah", email: "nana.yeboah@kingsford.edu.gh", class: "JHS 2A", gender: "M", parentId: "USR-P12", guardian: "Efua Yeboah", status: "Active", attendance: 79, gpa: 2.8, feesOwed: 980, avatarColor: "bg-pink-100 text-pink-700" },
+  { id: "KA-2413", name: "Kwaku Osei", email: "kwaku.osei@kingsford.edu.gh", class: "JHS 1B", gender: "M", parentId: "USR-P01", guardian: "Kwame Osei", status: "Active", attendance: 93, gpa: 3.4, feesOwed: 250, avatarColor: "bg-indigo-100 text-indigo-700" },
 ];
 
 export type Staff = {
@@ -278,13 +282,6 @@ export const lessonPlans = [
 ];
 
 /* ----------------------------- Users ------------------------------ */
-
-export const currentUsers = {
-  admin: { name: "Mrs. Akosua Danquah", role: "Head of Administration", email: "a.danquah@kingsford.edu.gh" },
-  teacher: { name: "Mr. Daniel Ampofo", role: "Mathematics · Class teacher, JHS 2A", email: "d.ampofo@kingsford.edu.gh" },
-  student: { name: "Abena Osei", role: "JHS 2A · KA-2401", email: "abena.osei@kingsford.edu.gh" },
-  parent: { name: "Kwame Osei", role: "Parent — Abena Osei (JHS 2A)", email: "kwame.osei@gmail.com" },
-};
 
 export const auditLog = [
   { id: 1, actor: "Mrs. Akosua Danquah", action: "Approved Term 3 report cards for JHS 3A", time: "Today, 9:41 AM" },

@@ -2,6 +2,7 @@ import { FileExportIcon, Pdf01Icon, Xls01Icon } from "hugeicons-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, Legend } from "recharts";
 import { PageHeader, Card, CardHeader, Badge, Button, Table, THead, TRow, TCell, Select, StatCard } from "../../components/ui";
 import { gpaTrend, auditLog, enrollmentByClass } from "../../data/mock";
+import { useToast } from "../../components/Toast";
 
 const subjectPerformance = [
   { subject: "Maths", avg: 74 },
@@ -21,6 +22,16 @@ const reportLibrary = [
 ];
 
 export default function AdminReports() {
+  const { toast } = useToast();
+
+  const exportReport = (name: string, format: "PDF" | "Excel" | "dashboard") => {
+    if (format === "dashboard") {
+      toast(`Dashboard exported (demo).`);
+    } else {
+      toast(`${name} — ${format} download started`);
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -29,7 +40,7 @@ export default function AdminReports() {
         actions={
           <>
             <Select options={["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"]} />
-            <Button icon={<FileExportIcon size={18} />}>Export dashboard</Button>
+            <Button icon={<FileExportIcon size={18} />} onClick={() => exportReport("Dashboard", "dashboard")}>Export dashboard</Button>
           </>
         }
       />
@@ -86,8 +97,8 @@ export default function AdminReports() {
                   <TCell>{r.updated}</TCell>
                   <TCell>
                     <div className="flex gap-1.5">
-                      <button className="rounded-lg p-2 text-error-600 hover:bg-error-50" title="PDF"><Pdf01Icon size={18} /></button>
-                      <button className="rounded-lg p-2 text-success-600 hover:bg-success-50" title="Excel"><Xls01Icon size={18} /></button>
+                      <button className="rounded-lg p-2 text-error-600 hover:bg-error-50" title="PDF" onClick={() => exportReport(r.name, "PDF")}><Pdf01Icon size={18} /></button>
+                      <button className="rounded-lg p-2 text-success-600 hover:bg-success-50" title="Excel" onClick={() => exportReport(r.name, "Excel")}><Xls01Icon size={18} /></button>
                     </div>
                   </TCell>
                 </TRow>
