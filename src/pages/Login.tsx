@@ -34,6 +34,7 @@ export default function Login() {
   const [email, setEmail] = useState("admin@kingsford.edu.gh");
   const [password, setPassword] = useState(DEMO_PASSWORD);
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -52,7 +53,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = login(email, password, role);
+    const result = login(email, password, role, remember);
     setLoading(false);
     if (!result.ok) {
       setError(result.error);
@@ -145,7 +146,12 @@ export default function Login() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600">
-                <input type="checkbox" defaultChecked className="size-4 rounded border-gray-300 accent-brand-600" />
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="size-4 rounded border-gray-300 accent-brand-600"
+                />
                 Remember me
               </label>
               <button

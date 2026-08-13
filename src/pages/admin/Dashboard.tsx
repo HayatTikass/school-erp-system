@@ -6,6 +6,7 @@ import {
   ArrowRight01Icon,
   Calendar03Icon,
 } from "hugeicons-react";
+import { Link } from "react-router-dom";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, Legend } from "recharts";
 import { PageHeader, StatCard, Card, CardHeader, Badge, statusTone, Button, Avatar, Table, THead, TRow, TCell } from "../../components/ui";
 import { revenueByMonth, enrollmentByClass, auditLog, events } from "../../data/mock";
@@ -90,7 +91,11 @@ export default function AdminDashboard() {
           <CardHeader
             title="Outstanding invoices"
             subtitle={`${outstanding.length} invoices need attention`}
-            action={<Button variant="secondary" size="sm">View all</Button>}
+            action={
+              <Link to="/admin/finance/invoices">
+                <Button variant="secondary" size="sm">View all</Button>
+              </Link>
+            }
           />
           <Table>
             <THead cols={["Invoice", "Student", "Item", "Balance", "Due date", "Status"]} />

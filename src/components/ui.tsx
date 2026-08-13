@@ -171,8 +171,12 @@ export function TRow({ children, className }: { children: ReactNode; className?:
   return <tr className={cn("border-b border-gray-100 last:border-0 hover:bg-gray-25", className)}>{children}</tr>;
 }
 
-export function TCell({ children, className }: { children?: ReactNode; className?: string }) {
-  return <td className={cn("px-5 py-3.5 whitespace-nowrap text-gray-600", className)}>{children}</td>;
+export function TCell({ children, className, colSpan }: { children?: ReactNode; className?: string; colSpan?: number }) {
+  return (
+    <td colSpan={colSpan} className={cn("px-5 py-3.5 whitespace-nowrap text-gray-600", className)}>
+      {children}
+    </td>
+  );
 }
 
 /* ------------------------------ Inputs ----------------------------- */

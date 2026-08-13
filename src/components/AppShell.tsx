@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   DashboardSquare01Icon,
@@ -238,9 +238,23 @@ const notifications = [
 export default function AppShell({ role }: { role: Role }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [navQuery, setNavQuery] = useState("");
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
+
+  const navGroups = useMemo(() => {
+    const q = navQuery.trim().toLowerCase();
+    if (!q) return nav[role];
+    return nav[role]
+      .map((group) => ({
+        ...group,
+        items: group.items.filter(
+          (item) => item.label.toLowerCase().includes(q) || group.section.toLowerCase().includes(q),
+        ),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [role, navQuery]);
 
   if (!user) return null;
 
@@ -263,11 +277,18 @@ export default function AppShell({ role }: { role: Role }) {
       </div>
 
       <div className="px-4 pb-4">
-        <SearchInput placeholder="Search" />
+        <SearchInput
+          placeholder="Search menu"
+          value={navQuery}
+          onChange={(e) => setNavQuery(e.target.value)}
+        />
       </div>
 
       <nav className="flex-1 space-y-5 overflow-y-auto px-4 pb-4">
-        {nav[role].map((group) => (
+        {navGroups.length === 0 && (
+          <p className="px-3 py-2 text-sm text-gray-400">No menu items match "{navQuery}".</p>
+        )}
+        {navGroups.map((group) => (
           <div key={group.section}>
             <p className="px-3 pb-1.5 text-xs font-semibold tracking-wide text-gray-400 uppercase">{group.section}</p>
             <div className="space-y-0.5">
@@ -276,7 +297,10 @@ export default function AppShell({ role }: { role: Role }) {
                   key={item.to}
                   to={item.to}
                   end={item.to === ROLE_META[role].portalPath}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setNavQuery("");
+                  }}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",

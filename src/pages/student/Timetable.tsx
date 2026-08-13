@@ -9,6 +9,7 @@ export default function StudentTimetable() {
     <TimetableView
       title={`Timetable & Schedule — ${name}`}
       subtitle={student ? `Weekly classes for ${student.class} — exam schedule and school events.` : "Your weekly classes, exam schedule and school events."}
+      className={student?.class}
     />
   );
 }

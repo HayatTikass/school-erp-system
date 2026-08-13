@@ -1,5 +1,5 @@
 import { Calendar03Icon } from "hugeicons-react";
-import { PageHeader, Card, CardHeader, Badge, Table, THead, TRow, TCell, Select } from "./ui";
+import { PageHeader, Card, CardHeader, Badge, Table, THead, TRow, TCell } from "./ui";
 import { timetable, events, subjects } from "../data/mock";
 
 const examSchedule = [
@@ -10,10 +10,23 @@ const examSchedule = [
   { date: "Fri 31 Jul", subject: "ICT", time: "8:00 – 9:30", room: "ICT Lab" },
 ];
 
-export default function TimetableView({ title, subtitle }: { title: string; subtitle: string }) {
+export default function TimetableView({
+  title,
+  subtitle,
+  className,
+}: {
+  title: string;
+  subtitle: string;
+  /** Class whose timetable is shown — rendered as a label, not a picker. */
+  className?: string;
+}) {
   return (
     <div>
-      <PageHeader title={title} subtitle={subtitle} actions={<Select options={["JHS 2A", "JHS 2B"]} />} />
+      <PageHeader
+        title={title}
+        subtitle={subtitle}
+        actions={className ? <Badge tone="brand">{className}</Badge> : undefined}
+      />
 
       <Card>
         <CardHeader title="Weekly timetable" subtitle="Effective from 4 May 2026" action={<Badge tone="brand" dot>Current week</Badge>} />
