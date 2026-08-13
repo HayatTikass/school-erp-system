@@ -68,7 +68,10 @@ export default function AdminUsers() {
   const [addOpen, setAddOpen] = useState(false);
   const [editUser, setEditUser] = useState<SystemUser | null>(null);
   const [menuUser, setMenuUser] = useState<SystemUser | null>(null);
-  const [confirm, setConfirm] = useState<{ user: SystemUser; action: "suspend" | "activate" | "reset" } | null>(null);
+  const [confirm, setConfirm] = useState<{ user: SystemUser; action: "suspend" | "activate" } | null>(null);
+  const [passwordUser, setPasswordUser] = useState<SystemUser | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState("");
@@ -162,10 +165,7 @@ export default function AdminUsers() {
 
   const runConfirm = () => {
     if (!confirm) return;
-    if (confirm.action === "reset") {
-      resetPassword(confirm.user.id);
-      toast(`Password reset to "${DEMO_PASSWORD}" for ${confirm.user.name}`);
-    } else if (confirm.action === "suspend") {
+    if (confirm.action === "suspend") {
       setUserStatus(confirm.user.id, "Suspended");
       toast(`${confirm.user.name} suspended`, "warning");
     } else {
@@ -174,6 +174,24 @@ export default function AdminUsers() {
     }
     setConfirm(null);
     setMenuUser(null);
+  };
+
+  const openPasswordChange = (u: SystemUser) => {
+    setPasswordUser(u);
+    setNewPassword("");
+    setPasswordError("");
+    setMenuUser(null);
+  };
+
+  const submitPasswordChange = () => {
+    if (!passwordUser) return;
+    if (newPassword.trim().length < 4) {
+      setPasswordError("Password must be at least 4 characters.");
+      return;
+    }
+    resetPassword(passwordUser.id, newPassword.trim());
+    toast(`Password updated for ${passwordUser.name}`);
+    setPasswordUser(null);
   };
 
   const linkedLabel = (u: SystemUser) => {
@@ -271,12 +289,9 @@ export default function AdminUsers() {
                       <div className="absolute top-10 right-0 z-20 w-48 rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
                         <button
                           className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                          onClick={() => {
-                            setConfirm({ user: u, action: "reset" });
-                            setMenuUser(null);
-                          }}
+                          onClick={() => openPasswordChange(u)}
                         >
-                          <Key01Icon size={16} /> Reset password
+                          <Key01Icon size={16} /> Change password
                         </button>
                         {u.status === "Active" ? (
                           <button
@@ -364,23 +379,49 @@ export default function AdminUsers() {
         open={!!confirm}
         onClose={() => setConfirm(null)}
         onConfirm={runConfirm}
-        title={
-          confirm?.action === "reset"
-            ? "Reset password?"
-            : confirm?.action === "suspend"
-              ? "Suspend account?"
-              : "Activate account?"
-        }
+        title={confirm?.action === "suspend" ? "Suspend account?" : "Activate account?"}
         message={
-          confirm?.action === "reset"
-            ? `Reset ${confirm.user.name}'s password to "${DEMO_PASSWORD}"?`
-            : confirm?.action === "suspend"
-              ? `${confirm.user.name} will not be able to sign in until reactivated.`
-              : `${confirm?.user.name} will regain portal access.`
+          confirm?.action === "suspend"
+            ? `${confirm.user.name} will not be able to sign in until reactivated.`
+            : `${confirm?.user.name} will regain portal access.`
         }
-        confirmLabel={confirm?.action === "reset" ? "Reset password" : confirm?.action === "suspend" ? "Suspend" : "Activate"}
+        confirmLabel={confirm?.action === "suspend" ? "Suspend" : "Activate"}
         destructive={confirm?.action === "suspend"}
       />
+
+      {/* Change password modal */}
+      <Modal
+        open={!!passwordUser}
+        onClose={() => setPasswordUser(null)}
+        title="Change password"
+        subtitle={passwordUser ? `Set a new password for ${passwordUser.name}` : undefined}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setPasswordUser(null)}>
+              Cancel
+            </Button>
+            <Button onClick={submitPasswordChange}>Save password</Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {passwordError && (
+            <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-sm text-error-700">
+              {passwordError}
+            </div>
+          )}
+          <Field label="New password" required>
+            <input
+              type="text"
+              className={inputClass}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter a new password"
+              autoFocus
+            />
+          </Field>
+        </div>
+      </Modal>
 
       <Modal
         open={importOpen}

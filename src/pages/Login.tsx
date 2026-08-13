@@ -13,26 +13,14 @@ import { school } from "../data/mock";
 import { Button } from "../components/ui";
 import { ROLES, ROLE_META, type Role } from "../types/roles";
 import { useAuth } from "../auth/AuthContext";
-import { DEMO_PASSWORD } from "../data/users";
 import { useToast } from "../components/Toast";
 
 const roleOptions = ROLES.map((r) => ({ value: r, ...ROLE_META[r] }));
 
-const demoHints: { role: Role; email: string }[] = [
-  { role: "admin", email: "admin@kingsford.edu.gh" },
-  { role: "headmaster", email: "headmaster@kingsford.edu.gh" },
-  { role: "accountant", email: "accountant@kingsford.edu.gh" },
-  { role: "teacher", email: "teacher@kingsford.edu.gh" },
-  { role: "librarian", email: "librarian@kingsford.edu.gh" },
-  { role: "hr", email: "hr@kingsford.edu.gh" },
-  { role: "student", email: "student@kingsford.edu.gh" },
-  { role: "parent", email: "parent@kingsford.edu.gh" },
-];
-
 export default function Login() {
   const [role, setRole] = useState<Role>("admin");
-  const [email, setEmail] = useState("admin@kingsford.edu.gh");
-  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,9 +30,6 @@ export default function Login() {
 
   const onRoleChange = (next: Role) => {
     setRole(next);
-    const hint = demoHints.find((d) => d.role === next);
-    if (hint) setEmail(hint.email);
-    setPassword(DEMO_PASSWORD);
     setError("");
   };
 
@@ -161,25 +146,6 @@ export default function Login() {
               {loading ? "Signing in…" : `Sign in as ${ROLE_META[role].shortLabel}`}
             </Button>
           </form>
-
-          <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Demo accounts</p>
-            <p className="mt-1 text-xs text-gray-500">
-              Password for all roles: <span className="font-semibold text-gray-800">{DEMO_PASSWORD}</span>
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-1.5">
-              {demoHints.map((d) => (
-                <button
-                  key={d.role}
-                  type="button"
-                  onClick={() => onRoleChange(d.role)}
-                  className="truncate rounded-md px-2 py-1.5 text-left text-xs font-medium text-gray-600 hover:bg-white hover:text-brand-700"
-                >
-                  {ROLE_META[d.role].shortLabel}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Accounts are created by the school admin. Help: <span className="font-semibold text-gray-700">030 555 0100</span>

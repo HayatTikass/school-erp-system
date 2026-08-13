@@ -21,20 +21,13 @@ npm run dev      # http://localhost:5173
 npm run build    # type-check + production build
 ```
 
-Sign in with **role + email + password**. All demo accounts use password `password`.
+Sign in with **role + email + password**.
 
 | Role | Email |
 | --- | --- |
-| Admin | `admin@kingsford.edu.gh` |
-| Headmaster | `headmaster@kingsford.edu.gh` |
-| Accountant | `accountant@kingsford.edu.gh` |
-| Teacher | `teacher@kingsford.edu.gh` |
-| Librarian | `librarian@kingsford.edu.gh` |
-| HR Officer | `hr@kingsford.edu.gh` |
-| Student | `student@kingsford.edu.gh` |
-| Parent | `parent@kingsford.edu.gh` |
+| Admin | `admin@kingsford.edu.gh` (password `password`) |
 
-**Admin** creates all accounts under Users & Roles. Students must be linked to a parent. Parent `parent@kingsford.edu.gh` is linked to Abena Osei and Kwaku Osei.
+**Admin** creates all other accounts under Users & Roles. Students must be linked to a parent.
 
 ## Portals & pages
 
