@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FileExportIcon, Pdf01Icon, Xls01Icon } from "hugeicons-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, Legend } from "recharts";
 import { PageHeader, Card, CardHeader, Badge, Button, Table, THead, TRow, TCell, Select, StatCard } from "../../components/ui";
@@ -21,14 +22,17 @@ const reportLibrary = [
   { name: "Staff payroll audit (Jan – Jun)", type: "Finance", updated: "2 weeks ago" },
 ];
 
+const TERMS = ["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"];
+
 export default function AdminReports() {
   const { toast } = useToast();
+  const [term, setTerm] = useState(TERMS[0]);
 
   const exportReport = (name: string, format: "PDF" | "Excel" | "dashboard") => {
     if (format === "dashboard") {
-      toast(`Dashboard exported (demo).`);
+      toast(`Dashboard exported for ${term} (demo).`);
     } else {
-      toast(`${name} — ${format} download started`);
+      toast(`${name} (${term}) — ${format} download started`);
     }
   };
 
@@ -36,10 +40,10 @@ export default function AdminReports() {
     <div>
       <PageHeader
         title="Reports & Analytics"
-        subtitle="Academic, financial and operational insight across the school."
+        subtitle={`Academic, financial and operational insight across the school — ${term}.`}
         actions={
           <>
-            <Select options={["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"]} />
+            <Select options={TERMS} value={term} onChange={setTerm} />
             <Button icon={<FileExportIcon size={18} />} onClick={() => exportReport("Dashboard", "dashboard")}>Export dashboard</Button>
           </>
         }

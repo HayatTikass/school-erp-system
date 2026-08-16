@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SentIcon, Attachment01Icon, PencilEdit02Icon } from "hugeicons-react";
 import { PageHeader, Card, Badge, Button, Avatar, SearchInput } from "./ui";
 import { Modal, Field, inputClass } from "./Modal";
@@ -16,6 +16,7 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
   const [draft, setDraft] = useState("");
   const [newOpen, setNewOpen] = useState(false);
   const [newForm, setNewForm] = useState({ name: "", role: "Parent", message: "" });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     if (!query) return conversations;
@@ -123,7 +124,22 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
           </div>
 
           <div className="flex items-center gap-2 border-t border-gray-200 p-4">
-            <button type="button" className="rounded-lg p-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600" title="Attach file">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) toast(`Attached "${file.name}" (demo — not uploaded)`, "info");
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-lg p-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+              title="Attach file"
+            >
               <Attachment01Icon size={20} />
             </button>
             <input

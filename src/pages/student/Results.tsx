@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Pdf01Icon, Award01Icon } from "hugeicons-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { PageHeader, Card, CardHeader, Badge, Button, Table, THead, TRow, TCell, Select, StatCard } from "../../components/ui";
@@ -7,10 +7,14 @@ import { useAppStore } from "../../store/AppStore";
 import { useCurrentStudent } from "../../hooks/usePortalIdentity";
 import { useToast } from "../../components/Toast";
 
+const TERMS = ["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"];
+
 export default function StudentResults() {
   const student = useCurrentStudent();
   const { grades } = useAppStore();
   const { toast } = useToast();
+  const [term, setTerm] = useState(TERMS[0]);
+  const isCurrentTerm = term === TERMS[0];
 
   const myGrades = useMemo(
     () => (student ? grades.filter((g) => g.studentId === student.id && g.status === "Approved") : []),
@@ -37,11 +41,11 @@ export default function StudentResults() {
         subtitle={`Grades, GPA and report cards — ${student.name}, ${student.class}.`}
         actions={
           <>
-            <Select options={["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"]} />
+            <Select options={TERMS} value={term} onChange={setTerm} />
             <Button
               variant="secondary"
               icon={<Pdf01Icon size={18} />}
-              onClick={() => toast("Downloading report card (demo)…", "info")}
+              onClick={() => toast(`Downloading ${term} report card (demo)…`, "info")}
             >
               Download report card
             </Button>
@@ -58,8 +62,20 @@ export default function StudentResults() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
-          <CardHeader title="Term 3 results" subtitle="Continuous assessment (40%) + exam (60%)" action={<Badge tone="success" dot>Published</Badge>} />
-          {myGrades.length === 0 ? (
+          <CardHeader
+            title={`${term.split(" · ")[0]} results`}
+            subtitle="Continuous assessment (40%) + exam (60%)"
+            action={
+              <Badge tone={isCurrentTerm ? "success" : "gray"} dot>
+                {isCurrentTerm ? "Published" : "Archived"}
+              </Badge>
+            }
+          />
+          {!isCurrentTerm ? (
+            <p className="px-5 pb-5 text-sm text-gray-500">
+              {term} results are archived. Request a copy from the school office.
+            </p>
+          ) : myGrades.length === 0 ? (
             <p className="px-5 pb-5 text-sm text-gray-500">No published grades yet for your class.</p>
           ) : (
             <Table>

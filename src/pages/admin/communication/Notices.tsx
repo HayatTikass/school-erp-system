@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Megaphone01Icon, SentIcon, Mail01Icon, SmsCodeIcon } from "hugeicons-react";
 import { PageHeader, Card, CardHeader, Badge, Button, StatCard, Select } from "../../../components/ui";
 import { Modal, Field, inputClass } from "../../../components/Modal";
@@ -12,15 +12,39 @@ export default function CommunicationNotices() {
   const { notices, addNotice } = useAppStore();
   const { toast } = useToast();
   const [audience, setAudience] = useState("Everyone");
+  const [channels, setChannels] = useState<string[]>(["In-app", "SMS"]);
   const [message, setMessage] = useState("Reminder: Term 3 exams begin on Monday 27 July. Please ensure all fees are settled before exam week.");
   const [announceOpen, setAnnounceOpen] = useState(false);
+  const [boardFilter, setBoardFilter] = useState("All audiences");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tag, setTag] = useState<"Event" | "Academic" | "Finance" | "General">("General");
 
+  const toggleChannel = (channel: string) =>
+    setChannels((prev) =>
+      prev.includes(channel) ? prev.filter((c) => c !== channel) : [...prev, channel],
+    );
+
+  const boardFilterOptions = useMemo(
+    () => ["All audiences", ...Array.from(new Set(notices.map((n) => n.audience))).sort()],
+    [notices],
+  );
+
+  const visibleNotices = useMemo(
+    () =>
+      boardFilter === "All audiences"
+        ? notices
+        : notices.filter((n) => n.audience === boardFilter),
+    [notices, boardFilter],
+  );
+
   const sendBroadcast = () => {
     if (!message.trim()) {
       toast("Write a message first", "error");
+      return;
+    }
+    if (channels.length === 0) {
+      toast("Pick at least one channel", "error");
       return;
     }
     addNotice({
@@ -29,7 +53,7 @@ export default function CommunicationNotices() {
       audience,
       tag: "General",
     });
-    toast(`Broadcast sent to ${audience}`);
+    toast(`Broadcast sent to ${audience} via ${channels.join(", ")}`);
   };
 
   return (
@@ -61,9 +85,14 @@ export default function CommunicationNotices() {
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Channel</label>
               <div className="flex gap-2">
-                {["In-app", "SMS", "Email"].map((c, i) => (
+                {["In-app", "SMS", "Email"].map((c) => (
                   <label key={c} className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 has-checked:border-brand-600 has-checked:bg-brand-50 has-checked:text-brand-700">
-                    <input type="checkbox" defaultChecked={i < 2} className="hidden" />
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={channels.includes(c)}
+                      onChange={() => toggleChannel(c)}
+                    />
                     {c}
                   </label>
                 ))}
@@ -84,9 +113,16 @@ export default function CommunicationNotices() {
         </Card>
 
         <Card className="xl:col-span-2">
-          <CardHeader title="Noticeboard" subtitle="Published announcements" action={<Select options={["All audiences", "Parents", "Students", "Everyone"]} />} />
+          <CardHeader
+            title="Noticeboard"
+            subtitle="Published announcements"
+            action={<Select options={boardFilterOptions} value={boardFilter} onChange={setBoardFilter} />}
+          />
           <div className="divide-y divide-gray-100 px-5">
-            {notices.map((n) => (
+            {visibleNotices.length === 0 && (
+              <p className="py-6 text-sm text-gray-400">No notices for {boardFilter}.</p>
+            )}
+            {visibleNotices.map((n) => (
               <div key={n.id} className="py-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone={tagTone[n.tag]}>{n.tag}</Badge>
