@@ -334,6 +334,28 @@ alter table public.discipline_cases enable row level security;
 alter table public.conversations enable row level security;
 alter table public.messages enable row level security;
 
+-- Pre-auth check: does this email belong to the selected role? Callable by anon
+-- so the client never creates a session for a mismatched role.
+create or replace function public.login_role_matches(p_email text, p_role public.role_type)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where lower(email) = lower(trim(p_email))
+      and role = p_role
+      and status = 'Active'
+      and auth_user_id is not null
+  );
+$$;
+
+revoke all on function public.login_role_matches(text, public.role_type) from public;
+grant execute on function public.login_role_matches(text, public.role_type) to anon, authenticated, service_role;
+
 -- Helper: current user's role from profiles
 create or replace function public.current_role()
 returns public.role_type

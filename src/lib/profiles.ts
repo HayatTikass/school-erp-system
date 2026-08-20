@@ -34,6 +34,16 @@ export function profileToUser(row: ProfileRow, previous?: SystemUser): SystemUse
   };
 }
 
+/** True if this email is an active account for the selected role. Null if the check could not run. */
+export async function loginRoleMatches(email: string, role: Role): Promise<boolean | null> {
+  const { data, error } = await supabase.rpc("login_role_matches", {
+    p_email: email,
+    p_role: role,
+  });
+  if (error) return null;
+  return data === true;
+}
+
 export async function fetchProfileByAuthId(authUserId: string): Promise<SystemUser | null> {
   const { data, error } = await supabase
     .from("profiles")

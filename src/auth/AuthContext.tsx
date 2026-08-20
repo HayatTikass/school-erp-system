@@ -1,12 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import type { Role, SystemUser } from "../types/roles";
 import { ROLE_META } from "../types/roles";
 import { useAppStore } from "../store/AppStore";
 import { supabase } from "../lib/supabase";
-import { fetchProfileByAuthId } from "../lib/profiles";
+import { fetchProfileByAuthId, loginRoleMatches } from "../lib/profiles";
 
 const LEGACY_SESSION_KEY = "kingsford.session";
+const CREDENTIALS_ERROR = "Email, password, or selected role is incorrect.";
 
 type LoginResult = { ok: true } | { ok: false; error: string };
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { users } = useAppStore();
   const [fallback, setFallback] = useState<SystemUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const verifyingLoginRef = useRef(false);
 
   const user = useMemo(() => {
     if (!fallback) return null;
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let alive = true;
 
     const applySession = async (authUserId: string | null) => {
+      if (verifyingLoginRef.current) return;
       if (!authUserId) {
         if (alive) {
           setFallback(null);
@@ -60,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       const profile = await fetchProfileByAuthId(authUserId);
-      if (!alive) return;
+      if (!alive || verifyingLoginRef.current) return;
       if (!profile || profile.status !== "Active") {
         await supabase.auth.signOut();
         setFallback(null);
@@ -75,7 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       void applySession(data.session?.user.id ?? null);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // SIGNED_IN is applied only after login() finishes its role/status checks.
+      if (event === "SIGNED_IN" || verifyingLoginRef.current) return;
       void applySession(session?.user.id ?? null);
     });
 
@@ -86,36 +91,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string, role: Role, _remember = true) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
-    if (error || !data.user) {
-      return {
-        ok: false as const,
-        error: "Email or password is incorrect.",
-      };
-    }
+    const emailNorm = email.trim().toLowerCase();
+    verifyingLoginRef.current = true;
+    try {
+      const roleOk = await loginRoleMatches(emailNorm, role);
+      if (roleOk === false) {
+        return { ok: false as const, error: CREDENTIALS_ERROR };
+      }
 
-    const profile = await fetchProfileByAuthId(data.user.id);
-    if (!profile) {
-      await supabase.auth.signOut();
-      return { ok: false as const, error: "This account has no school profile. Contact admin." };
-    }
-    if (profile.role !== role) {
-      await supabase.auth.signOut();
-      return {
-        ok: false as const,
-        error: `This account is a ${ROLE_META[profile.role].label}. Choose that role, then sign in.`,
-      };
-    }
-    if (profile.status !== "Active") {
-      await supabase.auth.signOut();
-      return { ok: false as const, error: `This account is ${profile.status.toLowerCase()}. Contact admin.` };
-    }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailNorm,
+        password,
+      });
+      if (error || !data.user) {
+        return { ok: false as const, error: CREDENTIALS_ERROR };
+      }
 
-    setFallback(profile);
-    return { ok: true as const };
+      const profile = await fetchProfileByAuthId(data.user.id);
+      if (!profile || profile.role !== role || profile.status !== "Active") {
+        await supabase.auth.signOut();
+        return { ok: false as const, error: CREDENTIALS_ERROR };
+      }
+
+      setFallback(profile);
+      setLoading(false);
+      return { ok: true as const };
+    } finally {
+      verifyingLoginRef.current = false;
+    }
   }, []);
 
   const logout = useCallback(async () => {
