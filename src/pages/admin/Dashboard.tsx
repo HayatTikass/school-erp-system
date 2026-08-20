@@ -46,7 +46,7 @@ export default function AdminDashboard() {
       {/* Charts row */}
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
-          <CardHeader title="Revenue vs expenses" subtitle="Jan – Jun 2026 (GH₵)" action={<Badge tone="success" dot>On track</Badge>} />
+          <CardHeader title="Revenue vs expenses" subtitle="Jan to Jun 2026 (GH₵)" action={<Badge tone="success" dot>On track</Badge>} />
           <div className="h-72 p-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueByMonth} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
               {auditLog.slice(0, 4).map((log) => (
                 <div key={log.id} className="py-3">
                   <p className="text-sm text-gray-700">
-                    <span className="font-semibold text-gray-900">{log.actor}</span> — {log.action}
+                    <span className="font-semibold text-gray-900">{log.actor}</span> · {log.action}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">{log.time}</p>
                 </div>

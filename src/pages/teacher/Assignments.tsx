@@ -118,7 +118,7 @@ export default function TeacherAssignments() {
       </div>
 
       <Card className="mt-6">
-        <CardHeader title="All assignments" subtitle="Mathematics — Term 3" />
+        <CardHeader title="All assignments" subtitle="Mathematics · Term 3" />
         <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-5 py-3.5">
           <SearchInput placeholder="Search assignments…" className="w-72" value={search} onChange={(e) => setSearch(e.target.value)} />
           <Select options={CLASS_OPTIONS} value={classFilter} onChange={setClassFilter} />
@@ -150,7 +150,7 @@ export default function TeacherAssignments() {
                       <button type="button" onClick={() => openGrading(a)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600" title="View submissions">
                         <EyeIcon size={18} />
                       </button>
-                      <button type="button" onClick={() => toast("Edit assignment — use create form fields as reference", "info")} className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600" title="Edit">
+                      <button type="button" onClick={() => toast("Edit assignment · use create form fields as reference", "info")} className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600" title="Edit">
                         <PencilEdit02Icon size={18} />
                       </button>
                     </div>
@@ -166,7 +166,7 @@ export default function TeacherAssignments() {
         <Card className="mt-6">
           <CardHeader
             title="Grading queue"
-            subtitle={`${gradingQueue.assignment.title} — ${gradingQueue.toGrade} submissions to grade`}
+            subtitle={`${gradingQueue.assignment.title} · ${gradingQueue.toGrade} submissions to grade`}
             action={<Button size="sm" onClick={() => openGrading(gradingQueue.assignment)}>Start grading</Button>}
           />
           <div className="grid grid-cols-2 gap-4 p-5 sm:grid-cols-4">

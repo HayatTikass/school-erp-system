@@ -99,7 +99,7 @@ export default function Payments() {
       },
       inv.id,
     );
-    toast(`Payment ${payment.id} recorded — ${formatMoney(amount)} from ${inv.student}`);
+    toast(`Payment ${payment.id} recorded · ${formatMoney(amount)} from ${inv.student}`);
     setPayOpen(false);
     setPayForm({ invoiceId: "", amount: "", method: "MoMo" });
   };
@@ -108,7 +108,7 @@ export default function Payments() {
     <div>
       <PageHeader
         title="Payments"
-        subtitle="All fee payments received — MoMo, bank transfer and cash."
+        subtitle="All fee payments received · MoMo, bank transfer and cash."
         actions={
           <>
             <Link to="/accountant">
@@ -285,7 +285,7 @@ export default function Payments() {
               <option value="">Select invoice…</option>
               {outstanding.map((inv) => (
                 <option key={inv.id} value={inv.id}>
-                  {inv.id} — {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
+                  {inv.id} · {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
                 </option>
               ))}
             </select>
@@ -313,7 +313,7 @@ export default function Payments() {
           </div>
           {outstanding.length === 0 && (
             <p className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">
-              No outstanding invoices right now — everyone is fully paid.
+              No outstanding invoices right now · everyone is fully paid.
             </p>
           )}
         </div>

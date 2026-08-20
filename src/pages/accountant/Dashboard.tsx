@@ -61,8 +61,8 @@ export default function AccountantDashboard() {
   return (
     <div>
       <PageHeader
-        title={`Finance desk — ${user?.name.split(" ")[1] || user?.name}`}
-        subtitle="Collection overview — open the student fee ledger for the full list."
+        title={`Finance desk · ${user?.name.split(" ")[1] || user?.name}`}
+        subtitle="Collection overview · open the student fee ledger for the full list."
         actions={
           <>
             <Link to="/accountant/ledger">

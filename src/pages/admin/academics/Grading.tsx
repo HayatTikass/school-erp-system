@@ -6,7 +6,7 @@ export default function AcademicsGrading() {
     <div>
       <PageHeader
         title="Grading"
-        subtitle={`Academic year ${school.year} · ${school.term} — grading scale and assessment weighting.`}
+        subtitle={`Academic year ${school.year} · ${school.term} · grading scale and assessment weighting.`}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -16,14 +16,14 @@ export default function AcademicsGrading() {
             <THead cols={["Score range", "Grade", "GPA points", "Remark"]} />
             <tbody>
               {[
-                ["90 – 100", "A+", "4.0", "Outstanding"],
-                ["80 – 89", "A", "4.0", "Excellent"],
-                ["75 – 79", "A-", "3.7", "Excellent"],
-                ["70 – 74", "B+", "3.3", "Very good"],
-                ["65 – 69", "B", "3.0", "Good"],
-                ["60 – 64", "B-", "2.7", "Fair"],
-                ["50 – 59", "C", "2.0", "Pass"],
-                ["0 – 49", "F", "0.0", "Fail"],
+                ["90 to 100", "A+", "4.0", "Outstanding"],
+                ["80 to 89", "A", "4.0", "Excellent"],
+                ["75 to 79", "A-", "3.7", "Excellent"],
+                ["70 to 74", "B+", "3.3", "Very good"],
+                ["65 to 69", "B", "3.0", "Good"],
+                ["60 to 64", "B-", "2.7", "Fair"],
+                ["50 to 59", "C", "2.0", "Pass"],
+                ["0 to 49", "F", "0.0", "Fail"],
               ].map((row) => (
                 <TRow key={row[1]}>
                   <TCell className="font-medium text-gray-900">{row[0]}</TCell>

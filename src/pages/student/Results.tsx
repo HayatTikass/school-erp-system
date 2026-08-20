@@ -6,6 +6,7 @@ import { gpaTrend } from "../../data/mock";
 import { useAppStore } from "../../store/AppStore";
 import { useCurrentStudent } from "../../hooks/usePortalIdentity";
 import { useToast } from "../../components/Toast";
+import { LABEL_SEP } from "../../lib/display";
 
 const TERMS = ["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"];
 
@@ -21,7 +22,7 @@ export default function StudentResults() {
     [grades, student],
   );
 
-  const avgScore = myGrades.length ? (myGrades.reduce((a, g) => a + g.total, 0) / myGrades.length).toFixed(1) : "—";
+  const avgScore = myGrades.length ? (myGrades.reduce((a, g) => a + g.total, 0) / myGrades.length).toFixed(1) : "None";
   const best = myGrades.length ? [...myGrades].sort((a, b) => b.total - a.total)[0] : null;
   const weakest = myGrades.length ? [...myGrades].sort((a, b) => a.total - b.total)[0] : null;
 
@@ -38,7 +39,7 @@ export default function StudentResults() {
     <div>
       <PageHeader
         title="My Academic Results"
-        subtitle={`Grades, GPA and report cards — ${student.name}, ${student.class}.`}
+        subtitle={`Grades, GPA and report cards · ${student.name}, ${student.class}.`}
         actions={
           <>
             <Select options={TERMS} value={term} onChange={setTerm} />
@@ -56,14 +57,14 @@ export default function StudentResults() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Term GPA" value={student.gpa.toFixed(1)} delta="this term" />
         <StatCard label="Class" value={student.class} delta={student.id} deltaLabel="" icon={<Award01Icon size={20} />} iconBg="bg-warning-50 text-warning-600" />
-        <StatCard label="Strongest subject" value={best?.subject ?? "—"} delta={best ? `${best.total}%` : ""} deltaLabel="" iconBg="bg-success-50 text-success-600" />
-        <StatCard label="Average score" value={avgScore !== "—" ? `${avgScore}%` : "—"} delta={weakest ? `focus: ${weakest.subject}` : ""} iconBg="bg-blue-50 text-blue-600" />
+        <StatCard label="Strongest subject" value={best?.subject ?? "None"} delta={best ? `${best.total}%` : ""} deltaLabel="" iconBg="bg-success-50 text-success-600" />
+        <StatCard label="Average score" value={avgScore !== "None" ? `${avgScore}%` : "None"} delta={weakest ? `focus: ${weakest.subject}` : ""} iconBg="bg-blue-50 text-blue-600" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader
-            title={`${term.split(" · ")[0]} results`}
+            title={`${term.split(LABEL_SEP)[0]} results`}
             subtitle="Continuous assessment (40%) + exam (60%)"
             action={
               <Badge tone={isCurrentTerm ? "success" : "gray"} dot>

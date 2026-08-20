@@ -37,6 +37,7 @@ create table public.profiles (
   phone text,
   role public.role_type not null,
   status public.account_status not null default 'Active',
+  is_super_admin boolean not null default false,
   department text,
   title text,
   created_at timestamptz not null default now(),
@@ -393,3 +394,34 @@ create index idx_submissions_assignment on public.assignment_submissions (assign
 create index idx_grades_student on public.grades (student_id);
 create index idx_loans_status on public.loans (status);
 create index idx_messages_conversation on public.messages (conversation_id);
+
+-- ---------------------------------------------------------------------------
+-- Admin RPCs (auth.users + profiles). Execute granted to authenticated only.
+-- ---------------------------------------------------------------------------
+create or replace function public.admin_reset_password(p_profile_id uuid, p_password text)
+returns void
+language plpgsql
+security definer
+set search_path = public, auth, extensions
+as $$
+declare
+  v_auth_id uuid;
+begin
+  if public.current_role() <> 'admin' then
+    raise exception 'Only admins can reset passwords';
+  end if;
+  if length(trim(p_password)) < 4 then
+    raise exception 'Password must be at least 4 characters';
+  end if;
+
+  select auth_user_id into v_auth_id from public.profiles where id = p_profile_id;
+  if v_auth_id is null then
+    raise exception 'User not found';
+  end if;
+
+  update auth.users
+    set encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf')),
+        updated_at = now()
+    where id = v_auth_id;
+end;
+$$;

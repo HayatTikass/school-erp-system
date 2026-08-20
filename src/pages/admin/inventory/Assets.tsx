@@ -39,7 +39,7 @@ export default function InventoryAssets() {
       name: form.name.trim(),
       category: form.category,
       qty: Number(form.qty) || 1,
-      location: form.location.trim() || "—",
+      location: form.location.trim() || "None",
       condition: form.condition,
       value: Number(form.value) || 0,
     });

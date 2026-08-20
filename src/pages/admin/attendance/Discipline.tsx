@@ -23,7 +23,7 @@ export default function AttendanceDiscipline() {
     const student = students.find((s) => s.name === incidentForm.student);
     addDiscipline({
       student: incidentForm.student.trim(),
-      className: incidentForm.className || student?.class || "—",
+      className: incidentForm.className || student?.class || "None",
       incident: incidentForm.incident.trim(),
       severity: incidentForm.severity,
       status: "Open",

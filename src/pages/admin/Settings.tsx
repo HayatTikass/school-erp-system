@@ -255,7 +255,7 @@ export default function AdminSettings() {
                 <Button variant="secondary" size="sm" onClick={() => toast("Restore wizard opened (demo).", "info")}>Restore</Button>
               </div>
               <div className="flex gap-3">
-                <Button variant="secondary" className="flex-1" onClick={() => toast("Backup started — you will be notified when complete.", "info")}>Back up now</Button>
+                <Button variant="secondary" className="flex-1" onClick={() => toast("Backup started · you will be notified when complete.", "info")}>Back up now</Button>
                 <Button variant="secondary" className="flex-1" onClick={() => toast("Full data export queued (demo).", "info")}>Export all data</Button>
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function AdminSettings() {
               {auditLog.map((log) => (
                 <div key={log.id} className="py-3">
                   <p className="text-sm text-gray-700">
-                    <span className="font-semibold text-gray-900">{log.actor}</span> — {log.action}
+                    <span className="font-semibold text-gray-900">{log.actor}</span> · {log.action}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">{log.time}</p>
                 </div>

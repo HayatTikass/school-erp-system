@@ -15,11 +15,11 @@ const subjectPerformance = [
 ];
 
 const reportLibrary = [
-  { name: "Term 3 academic performance — all classes", type: "Academic", updated: "Today" },
+  { name: "Term 3 academic performance · all classes", type: "Academic", updated: "Today" },
   { name: "Fee collection & arrears summary", type: "Finance", updated: "Yesterday" },
   { name: "Attendance trends by class (Term 3)", type: "Attendance", updated: "2 days ago" },
   { name: "Enrolment & headcount statistics", type: "Enrolment", updated: "1 week ago" },
-  { name: "Staff payroll audit (Jan – Jun)", type: "Finance", updated: "2 weeks ago" },
+  { name: "Staff payroll audit (Jan to Jun)", type: "Finance", updated: "2 weeks ago" },
 ];
 
 const TERMS = ["Term 3 · 2025/26", "Term 2 · 2025/26", "Term 1 · 2025/26"];
@@ -32,7 +32,7 @@ export default function AdminReports() {
     if (format === "dashboard") {
       toast(`Dashboard exported for ${term} (demo).`);
     } else {
-      toast(`${name} (${term}) — ${format} download started`);
+      toast(`${name} (${term}) · ${format} download started`);
     }
   };
 
@@ -40,7 +40,7 @@ export default function AdminReports() {
     <div>
       <PageHeader
         title="Reports & Analytics"
-        subtitle={`Academic, financial and operational insight across the school — ${term}.`}
+        subtitle={`Academic, financial and operational insight across the school · ${term}.`}
         actions={
           <>
             <Select options={TERMS} value={term} onChange={setTerm} />
@@ -134,7 +134,7 @@ export default function AdminReports() {
               {auditLog.slice(0, 3).map((log) => (
                 <div key={log.id} className="py-3">
                   <p className="text-sm text-gray-700">
-                    <span className="font-semibold text-gray-900">{log.actor}</span> — {log.action}
+                    <span className="font-semibold text-gray-900">{log.actor}</span> · {log.action}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">{log.time}</p>
                 </div>

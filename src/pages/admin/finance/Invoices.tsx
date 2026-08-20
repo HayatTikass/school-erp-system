@@ -197,7 +197,7 @@ export default function FinanceInvoices() {
               <option value="">Select invoice…</option>
               {outstanding.map((inv) => (
                 <option key={inv.id} value={inv.id}>
-                  {inv.id} — {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
+                  {inv.id} · {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
                 </option>
               ))}
             </select>

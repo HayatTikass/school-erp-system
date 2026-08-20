@@ -10,7 +10,7 @@ export default function AcademicsTimetable() {
     <div>
       <PageHeader
         title="Timetable"
-        subtitle="Weekly schedules by class — JHS 2A shown as reference."
+        subtitle="Weekly schedules by class · JHS 2A shown as reference."
         actions={
           <Button icon={<Calendar03Icon size={18} />} onClick={() => toast("Timetable editor will connect to scheduling module later.", "info")}>
             Edit timetable
@@ -19,7 +19,7 @@ export default function AcademicsTimetable() {
       />
 
       <Card>
-        <CardHeader title="Weekly timetable — JHS 2A" subtitle="Block B · Room 1" action={<Badge tone="brand" dot>Published</Badge>} />
+        <CardHeader title="Weekly timetable · JHS 2A" subtitle="Block B · Room 1" action={<Badge tone="brand" dot>Published</Badge>} />
         <Table>
           <THead cols={["Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]} />
           <tbody>

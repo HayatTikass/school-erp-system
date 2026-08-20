@@ -7,10 +7,10 @@ import { useAuth } from "../../auth/AuthContext";
 import { useAppStore } from "../../store/AppStore";
 
 const todaySchedule = [
-  { time: "7:30 – 8:50", subject: "Mathematics", class: "JHS 2A", room: "Block B · Rm 1", status: "Completed" },
-  { time: "8:50 – 9:30", subject: "Mathematics", class: "JHS 2B", room: "Block B · Rm 2", status: "Completed" },
-  { time: "9:50 – 10:30", subject: "Mathematics", class: "JHS 3A", room: "Block C · Rm 1", status: "In progress" },
-  { time: "11:10 – 11:50", subject: "Mathematics", class: "JHS 1A", room: "Block A · Rm 1", status: "Upcoming" },
+  { time: "7:30 to 8:50", subject: "Mathematics", class: "JHS 2A", room: "Block B · Rm 1", status: "Completed" },
+  { time: "8:50 to 9:30", subject: "Mathematics", class: "JHS 2B", room: "Block B · Rm 2", status: "Completed" },
+  { time: "9:50 to 10:30", subject: "Mathematics", class: "JHS 3A", room: "Block C · Rm 1", status: "In progress" },
+  { time: "11:10 to 11:50", subject: "Mathematics", class: "JHS 1A", room: "Block A · Rm 1", status: "Upcoming" },
 ];
 
 const TEACHER_CLASSES = ["JHS 1A", "JHS 2A", "JHS 2B", "JHS 3A"];
@@ -53,7 +53,7 @@ export default function TeacherDashboard() {
     <div>
       <PageHeader
         title={`Welcome back, ${user?.name || "Teacher"} 👋`}
-        subtitle={`${todayLabel()} — you have ${todaySchedule.length} lessons today and ${pendingGrading} submissions to grade.`}
+        subtitle={`${todayLabel()} · you have ${todaySchedule.length} lessons today and ${pendingGrading} submissions to grade.`}
         actions={
           <Link to="/teacher/attendance">
             <Button icon={<TaskDone01Icon size={18} />}>Mark attendance</Button>
@@ -87,8 +87,8 @@ export default function TeacherDashboard() {
               return (
                 <div key={s.time} className="flex flex-wrap items-center gap-4 py-4">
                   <div className="w-28 shrink-0">
-                    <p className="text-sm font-bold text-gray-900">{s.time.split(" – ")[0]}</p>
-                    <p className="text-xs text-gray-400">– {s.time.split(" – ")[1]}</p>
+                    <p className="text-sm font-bold text-gray-900">{s.time.split(" to ")[0]}</p>
+                    <p className="text-xs text-gray-400">to {s.time.split(" to ")[1]}</p>
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-900">

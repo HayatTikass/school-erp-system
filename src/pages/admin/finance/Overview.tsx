@@ -98,7 +98,7 @@ export default function FinanceOverview() {
       </div>
 
       <Card className="mt-6">
-        <CardHeader title="Cash flow" subtitle="Revenue vs expenses, Jan – Jun 2026" />
+        <CardHeader title="Cash flow" subtitle="Revenue vs expenses, Jan to Jun 2026" />
         <div className="h-64 p-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={revenueByMonth} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -174,7 +174,7 @@ export default function FinanceOverview() {
               <option value="">Select invoice…</option>
               {outstanding.map((inv) => (
                 <option key={inv.id} value={inv.id}>
-                  {inv.id} — {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
+                  {inv.id} · {inv.student} ({formatMoney(inv.amount - inv.paid)} due)
                 </option>
               ))}
             </select>

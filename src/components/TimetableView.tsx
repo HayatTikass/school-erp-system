@@ -3,11 +3,11 @@ import { PageHeader, Card, CardHeader, Badge, Table, THead, TRow, TCell } from "
 import { timetable, events, subjects } from "../data/mock";
 
 const examSchedule = [
-  { date: "Mon 27 Jul", subject: "Mathematics", time: "8:00 – 10:00", room: "Assembly Hall" },
-  { date: "Tue 28 Jul", subject: "English Language", time: "8:00 – 10:00", room: "Assembly Hall" },
-  { date: "Wed 29 Jul", subject: "Integrated Science", time: "8:00 – 10:00", room: "Assembly Hall" },
-  { date: "Thu 30 Jul", subject: "Social Studies", time: "8:00 – 9:30", room: "Block B · Rm 1" },
-  { date: "Fri 31 Jul", subject: "ICT", time: "8:00 – 9:30", room: "ICT Lab" },
+  { date: "Mon 27 Jul", subject: "Mathematics", time: "8:00 to 10:00", room: "Assembly Hall" },
+  { date: "Tue 28 Jul", subject: "English Language", time: "8:00 to 10:00", room: "Assembly Hall" },
+  { date: "Wed 29 Jul", subject: "Integrated Science", time: "8:00 to 10:00", room: "Assembly Hall" },
+  { date: "Thu 30 Jul", subject: "Social Studies", time: "8:00 to 9:30", room: "Block B · Rm 1" },
+  { date: "Fri 31 Jul", subject: "ICT", time: "8:00 to 9:30", room: "ICT Lab" },
 ];
 
 export default function TimetableView({
@@ -17,7 +17,7 @@ export default function TimetableView({
 }: {
   title: string;
   subtitle: string;
-  /** Class whose timetable is shown — rendered as a label, not a picker. */
+  /** Class whose timetable is shown · rendered as a label, not a picker. */
   className?: string;
 }) {
   return (
@@ -53,7 +53,7 @@ export default function TimetableView({
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>
-          <CardHeader title="Term 3 exam schedule" subtitle="27 – 31 July · arrive 30 minutes early" action={<Badge tone="error" dot>3 weeks away</Badge>} />
+          <CardHeader title="Term 3 exam schedule" subtitle="27 to 31 July · arrive 30 minutes early" action={<Badge tone="error" dot>3 weeks away</Badge>} />
           <Table>
             <THead cols={["Date", "Subject", "Time", "Venue"]} />
             <tbody>

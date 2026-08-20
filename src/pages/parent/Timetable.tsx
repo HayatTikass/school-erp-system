@@ -7,8 +7,8 @@ export default function ParentTimetable() {
 
   return (
     <TimetableView
-      title={`Timetable & Events — ${name}`}
-      subtitle={selectedChild ? `Class timetable for ${selectedChild.class} — exam schedule, PTA meetings and school events.` : "Class timetable, exam schedule, PTA meetings and school events."}
+      title={`Timetable & Events · ${name}`}
+      subtitle={selectedChild ? `Class timetable for ${selectedChild.class} · exam schedule, PTA meetings and school events.` : "Class timetable, exam schedule, PTA meetings and school events."}
       className={selectedChild?.class}
     />
   );

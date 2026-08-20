@@ -24,7 +24,7 @@ export function HeadmasterDashboard() {
     : null;
   const todayRecords = latestDate ? attendance.filter((a) => a.date === latestDate) : [];
   const presentToday = todayRecords.filter((a) => a.mark === "present" || a.mark === "late" || a.mark === "excused").length;
-  const attendanceToday = todayRecords.length > 0 ? `${Math.round((presentToday / todayRecords.length) * 100)}%` : "—";
+  const attendanceToday = todayRecords.length > 0 ? `${Math.round((presentToday / todayRecords.length) * 100)}%` : "None";
   const openDiscipline = discipline.filter((d) => d.status === "Open" || d.status === "Under review").length;
   const pendingAdmissions = applications.filter((a) => a.status === "Submitted" || a.status === "Review" || a.status === "Under review").length;
 
@@ -32,7 +32,7 @@ export function HeadmasterDashboard() {
     <div>
       <PageHeader
         title={`Welcome, ${user?.name.split(" ").slice(-1)[0]} 👋`}
-        subtitle="School leadership overview — academics, discipline and admissions."
+        subtitle="School leadership overview · academics, discipline and admissions."
       />
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Students enrolled" value={String(students.length)} delta={`${students.filter((s) => s.status === "Active").length} active`} deltaLabel="" />
@@ -75,7 +75,7 @@ export function LibrarianDashboard() {
   return (
     <div>
       <PageHeader
-        title={`Library desk — ${user?.name}`}
+        title={`Library desk · ${user?.name}`}
         subtitle="Catalogue, loans and overdue notices."
         actions={
           <>
@@ -106,7 +106,7 @@ export function HRDashboard() {
   return (
     <div>
       <PageHeader
-        title={`HR desk — ${user?.name}`}
+        title={`HR desk · ${user?.name}`}
         subtitle="Staff, leave and payroll."
         actions={
           <>

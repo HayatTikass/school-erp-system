@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppShell from "./components/AppShell";
 import Login from "./pages/Login";
 import { AppStoreProvider } from "./store/AppStore";
-import { AuthProvider, RequireAuth, useAuth } from "./auth/AuthContext";
+import { AuthProvider, AuthSplash, RequireAuth, useAuth } from "./auth/AuthContext";
 import { ToastProvider } from "./components/Toast";
 import { ROLE_META, type Role } from "./types/roles";
 
@@ -60,6 +60,7 @@ import ParentTimetable from "./pages/parent/Timetable";
 import ParentFees from "./pages/parent/Fees";
 import ParentMessages from "./pages/parent/Messages";
 import ParentProfile from "./pages/parent/Profile";
+import MyAccount from "./pages/Account";
 
 import {
   HeadmasterDashboard,
@@ -71,7 +72,8 @@ import FeeLedger from "./pages/accountant/FeeLedger";
 import Payments from "./pages/accountant/Payments";
 
 function Home() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <AuthSplash />;
   if (user) return <Navigate to={ROLE_META[user.role].portalPath} replace />;
   return <Login />;
 }
@@ -134,6 +136,7 @@ export default function App() {
 
                 <Route path="reports" element={<AdminReports />} />
                 <Route path="settings" element={<AdminSettings />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/headmaster" element={<Portal role="headmaster" />}>
@@ -150,6 +153,7 @@ export default function App() {
                 <Route path="communication/notices" element={<AdminNotices />} />
                 <Route path="communication/events" element={<AdminEvents />} />
                 <Route path="reports" element={<AdminReports />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/accountant" element={<Portal role="accountant" />}>
@@ -160,6 +164,7 @@ export default function App() {
                 <Route path="finance/invoices" element={<AdminInvoices />} />
                 <Route path="finance/fee-structure" element={<AdminFeeStructure />} />
                 <Route path="reports" element={<AdminReports />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/librarian" element={<Portal role="librarian" />}>
@@ -167,6 +172,7 @@ export default function App() {
                 <Route path="library" element={<Navigate to="/librarian/catalogue" replace />} />
                 <Route path="catalogue" element={<AdminCatalogue />} />
                 <Route path="loans" element={<AdminLoans />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/hr" element={<Portal role="hr" />}>
@@ -174,6 +180,7 @@ export default function App() {
                 <Route path="staff" element={<AdminStaffDirectory />} />
                 <Route path="leave" element={<AdminLeaveRequests />} />
                 <Route path="payroll" element={<AdminPayroll />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/teacher" element={<Portal role="teacher" />}>
@@ -185,6 +192,7 @@ export default function App() {
                 <Route path="classes" element={<TeacherClasses />} />
                 <Route path="report-cards" element={<TeacherReportCards />} />
                 <Route path="messages" element={<TeacherMessages />} />
+                <Route path="account" element={<MyAccount />} />
               </Route>
 
               <Route path="/student" element={<Portal role="student" />}>

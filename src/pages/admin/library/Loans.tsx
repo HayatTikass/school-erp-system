@@ -83,14 +83,14 @@ export default function Loans() {
               </div>
               {l.fine > 0 && (
                 <p className="mt-2 flex items-center gap-1.5 rounded-lg bg-error-50 px-3 py-2 text-xs font-medium text-error-700">
-                  <Alert01Icon size={14} /> Fine accruing: {formatMoney(l.fine)} — overdue notice sent to parent
+                  <Alert01Icon size={14} /> Fine accruing: {formatMoney(l.fine)} · overdue notice sent to parent
                 </p>
               )}
               <div className="mt-3 flex gap-2">
                 <Button size="sm" onClick={() => { returnBook(l.id); toast(`"${l.book}" returned by ${l.student}`); }}>
                   Return
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => { renewLoan(l.id); toast("Loan renewed — due date extended 14 days"); }}>
+                <Button variant="secondary" size="sm" onClick={() => { renewLoan(l.id); toast("Loan renewed · due date extended 14 days"); }}>
                   Renew
                 </Button>
               </div>
@@ -103,7 +103,7 @@ export default function Loans() {
       </Card>
 
       <Card className="mt-6">
-        <CardHeader title="Loans history" subtitle={`${loans.length} records — all statuses`} />
+        <CardHeader title="Loans history" subtitle={`${loans.length} records · all statuses`} />
         <Table>
           <THead cols={["Book", "Student", "Issued", "Due", "Status", "Fine", ""]} />
           <tbody>
@@ -116,14 +116,14 @@ export default function Loans() {
                 <TCell>
                   <Badge tone={statusTone(l.status)}>{l.status}</Badge>
                 </TCell>
-                <TCell>{l.fine > 0 ? formatMoney(l.fine) : "—"}</TCell>
+                <TCell>{l.fine > 0 ? formatMoney(l.fine) : "None"}</TCell>
                 <TCell>
                   {(l.status === "On loan" || l.status === "Overdue") && (
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => { returnBook(l.id); toast(`"${l.book}" returned by ${l.student}`); }}>
                         Return
                       </Button>
-                      <Button variant="secondary" size="sm" onClick={() => { renewLoan(l.id); toast("Loan renewed — due date extended 14 days"); }}>
+                      <Button variant="secondary" size="sm" onClick={() => { renewLoan(l.id); toast("Loan renewed · due date extended 14 days"); }}>
                         Renew
                       </Button>
                     </div>

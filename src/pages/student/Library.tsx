@@ -48,7 +48,7 @@ export default function StudentLibrary() {
 
   return (
     <div>
-      <PageHeader title="Library" subtitle={`Browse the catalogue, track loans and fines — ${student.name}.`} />
+      <PageHeader title="Library" subtitle={`Browse the catalogue, track loans and fines · ${student.name}.`} />
 
       {overdue && (
         <Card className="border-error-200 bg-error-25 p-5">
@@ -60,7 +60,7 @@ export default function StudentLibrary() {
               <div>
                 <p className="text-sm font-bold text-gray-900">"{overdue.book}" is overdue</p>
                 <p className="text-sm text-gray-600">
-                  Due {formatDate(overdue.due)} — return or renew to stop fines (currently {formatMoney(overdue.fine)}).
+                  Due {formatDate(overdue.due)} · return or renew to stop fines (currently {formatMoney(overdue.fine)}).
                 </p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function StudentLibrary() {
                       variant="secondary"
                       size="sm"
                       disabled={b.available === 0}
-                      onClick={() => toast(`Reservation placed for "${b.title}" — pick up within 3 days`, "info")}
+                      onClick={() => toast(`Reservation placed for "${b.title}" · pick up within 3 days`, "info")}
                     >
                       Reserve
                     </Button>

@@ -22,7 +22,7 @@ export default function AcademicsClasses() {
     addClass({
       name: classForm.name.trim(),
       teacher: classForm.teacher.trim(),
-      room: classForm.room.trim() || "—",
+      room: classForm.room.trim() || "None",
     });
     toast(`Class ${classForm.name.trim()} added`);
     setClassOpen(false);
@@ -33,7 +33,7 @@ export default function AcademicsClasses() {
     <div>
       <PageHeader
         title="Classes"
-        subtitle={`Academic year ${school.year} · ${school.term} — manage class groups and homeroom teachers.`}
+        subtitle={`Academic year ${school.year} · ${school.term} · manage class groups and homeroom teachers.`}
         actions={
           <>
             <Button variant="secondary" icon={<Calendar03Icon size={18} />} onClick={() => toast("Academic calendar editor coming soon.", "info")}>

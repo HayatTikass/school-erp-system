@@ -18,13 +18,13 @@ export const ROLE_META: Record<
   admin: {
     label: "System Administrator",
     shortLabel: "Admin",
-    description: "Full system control — users, settings and all modules",
+    description: "Full system control · users, settings and all modules",
     portalPath: "/admin",
   },
   headmaster: {
     label: "Headmaster",
     shortLabel: "Headmaster",
-    description: "School leadership — academics, discipline and reports",
+    description: "School leadership · academics, discipline and reports",
     portalPath: "/headmaster",
   },
   accountant: {
@@ -69,8 +69,11 @@ export type AccountStatus = "Active" | "Suspended" | "Inactive";
 
 export type SystemUser = {
   id: string;
+  /** Supabase `profiles.id` when the account lives in the database. */
+  profileId?: string;
   name: string;
   email: string;
+  /** Never stored after Supabase Auth is used; kept for local seed compatibility. */
   password: string;
   role: Role;
   phone: string;
@@ -80,4 +83,6 @@ export type SystemUser = {
   department?: string;
   title?: string;
   createdAt: string;
+  /** Protected account that cannot be suspended or removed. */
+  isSuperAdmin?: boolean;
 };

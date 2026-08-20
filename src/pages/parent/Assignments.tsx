@@ -40,7 +40,7 @@ export default function ParentAssignments() {
           .filter((n): n is number => n !== null)
           .reduce((a, b, _, arr) => a + b / arr.length, 0)
       ).toFixed(1)
-    : "—";
+    : "None";
 
   const subjects = [...new Set(classAssignments.map((a) => a.subject))];
   const childOptions = children.map((c) => c.name);
@@ -48,7 +48,7 @@ export default function ParentAssignments() {
   return (
     <div>
       <PageHeader
-        title={selectedChild ? `Assignments & Homework — ${selectedChild.name.split(" ")[0]}` : "Assignments & Homework"}
+        title={selectedChild ? `Assignments & Homework · ${selectedChild.name.split(" ")[0]}` : "Assignments & Homework"}
         subtitle="Track submission status and grades on returned work."
         actions={
           children.length > 0 ? (
@@ -70,12 +70,12 @@ export default function ParentAssignments() {
         <>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <StatCard label="Due / pending" value={String(pending.length)} delta="not yet submitted" deltaLabel="" positive={false} iconBg="bg-warning-50 text-warning-600" />
-            <StatCard label="Submitted on time" value={withStatus.length ? `${Math.round((onTime.length / withStatus.length) * 100)}%` : "—"} delta="this term" deltaLabel="" iconBg="bg-success-50 text-success-600" />
-            <StatCard label="Average grade" value={avgGrade !== "—" ? `${avgGrade}%` : "—"} delta="on returned work" deltaLabel="" iconBg="bg-blue-50 text-blue-600" />
+            <StatCard label="Submitted on time" value={withStatus.length ? `${Math.round((onTime.length / withStatus.length) * 100)}%` : "None"} delta="this term" deltaLabel="" iconBg="bg-success-50 text-success-600" />
+            <StatCard label="Average grade" value={avgGrade !== "None" ? `${avgGrade}%` : "None"} delta="on returned work" deltaLabel="" iconBg="bg-blue-50 text-blue-600" />
           </div>
 
           <Card className="mt-6">
-            <CardHeader title="Current & recent assignments" subtitle={`${selectedChild.class} — updated as teachers grade work`} />
+            <CardHeader title="Current & recent assignments" subtitle={`${selectedChild.class} · updated as teachers grade work`} />
             {filtered.length === 0 ? (
               <p className="px-5 pb-5 text-sm text-gray-500">No assignments for this class yet.</p>
             ) : (
@@ -90,7 +90,7 @@ export default function ParentAssignments() {
                       <TCell>{a.subject}</TCell>
                       <TCell>{formatDate(a.due)}</TCell>
                       <TCell><Badge tone={statusTone(status)} dot>{status}</Badge></TCell>
-                      <TCell className="font-semibold text-gray-900">{score ?? "—"}</TCell>
+                      <TCell className="font-semibold text-gray-900">{score ?? "None"}</TCell>
                     </TRow>
                   ))}
                 </tbody>
@@ -102,9 +102,9 @@ export default function ParentAssignments() {
             <CardHeader title="How you can help" subtitle={`Suggestions for ${selectedChild.name.split(" ")[0]}'s learning`} />
             <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
               {[
-                { title: "Stay on schedule", tip: pending.length ? `${pending.length} assignment(s) still pending — check due dates together each evening.` : "Great work — all assignments are submitted for now." },
+                { title: "Stay on schedule", tip: pending.length ? `${pending.length} assignment(s) still pending · check due dates together each evening.` : "Great work · all assignments are submitted for now." },
                 { title: "Review feedback", tip: graded.length ? "Discuss returned work and celebrate improvements in stronger subjects." : "Grades will appear here once teachers return marked work." },
-                { title: "Exam prep", tip: "Revision packs and past questions help — set a quiet study routine before exams." },
+                { title: "Exam prep", tip: "Revision packs and past questions help · set a quiet study routine before exams." },
               ].map((c) => (
                 <div key={c.title} className="rounded-xl bg-gray-50 p-4">
                   <p className="text-sm font-bold text-gray-900">{c.title}</p>

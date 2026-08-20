@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fontsource-variable/nunito-sans": "^5.2.7",
+    "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/vite": "^4.3.2",
     "hugeicons-react": "^0.4.0",
     "react": "^19.2.7",

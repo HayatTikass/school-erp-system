@@ -87,7 +87,7 @@ export default function AdminAdmissions() {
         <StatCard label="Applications (2026/27)" value={String(total)} delta={`${filtered.length} shown`} deltaLabel="" />
         <StatCard label="Entrance exams taken" value={String(examsTaken)} delta={total > 0 ? `${Math.round((examsTaken / total) * 100)}%` : "0%"} deltaLabel="completion rate" iconBg="bg-blue-50 text-blue-600" />
         <StatCard label="Offers accepted" value={String(accepted)} delta={`${applications.filter((a) => a.status === "Accepted").length} pending enrolment`} deltaLabel="" iconBg="bg-success-50 text-success-600" />
-        <StatCard label="Available seats" value="38" deltaLabel="across JHS 1–3" delta="JHS 1: 24" iconBg="bg-warning-50 text-warning-600" />
+        <StatCard label="Available seats" value="38" deltaLabel="across JHS 1 to 3" delta="JHS 1: 24" iconBg="bg-warning-50 text-warning-600" />
       </div>
 
       <Card className="mt-6 p-5">
@@ -145,7 +145,7 @@ export default function AdminAdmissions() {
                       <span className="text-xs font-semibold text-gray-700">{a.exam}%</span>
                     </div>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-gray-400">None</span>
                   )}
                 </TCell>
                 <TCell><Badge tone={statusTone(a.status)} dot>{a.status}</Badge></TCell>
@@ -172,7 +172,7 @@ export default function AdminAdmissions() {
       <Modal
         open={!!review}
         onClose={() => setReview(null)}
-        title={review ? `Review — ${review.name}` : "Review"}
+        title={review ? `Review · ${review.name}` : "Review"}
         subtitle={review ? `${review.id} · applying for ${review.appliedFor}` : ""}
         footer={
           review && (
@@ -194,7 +194,7 @@ export default function AdminAdmissions() {
               <Button
                 onClick={() => {
                   updateApplicationStatus(review.id, "Accepted");
-                  toast(`${review.name} accepted — enrolment letter queued`);
+                  toast(`${review.name} accepted · enrolment letter queued`);
                   setReview(null);
                 }}
               >

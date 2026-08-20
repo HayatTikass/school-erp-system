@@ -1,6 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { SystemUser, Role, AccountStatus } from "../types/roles";
-import { DEMO_PASSWORD, seedUsers } from "../data/users";
+import { ROLE_META } from "../types/roles";
+import { generateTempPassword } from "../lib/passwords";
+import { seedUsers } from "../data/users";
 import {
   students as seedStudents,
   invoices as seedInvoices,
@@ -48,6 +50,16 @@ import {
   seedSubmissions,
   computeGrade,
 } from "./domain";
+import { supabase } from "../lib/supabase";
+import { fetchProfileByAuthId, fetchProfiles, publicError } from "../lib/profiles";
+
+type NewChildInput = {
+  name: string;
+  email: string;
+  className: string;
+  gender: "M" | "F";
+  password?: string;
+};
 
 type NewUserInput = {
   name: string;
@@ -61,6 +73,7 @@ type NewUserInput = {
   studentClass?: string;
   gender?: "M" | "F";
   parentId?: string;
+  children?: NewChildInput[];
 };
 
 type AppStoreValue = {
@@ -87,10 +100,11 @@ type AppStoreValue = {
   events: SchoolEvent[];
   discipline: DisciplineCase[];
 
-  addUser: (input: NewUserInput) => { ok: true; user: SystemUser } | { ok: false; error: string };
-  updateUser: (id: string, patch: Partial<SystemUser>) => void;
-  setUserStatus: (id: string, status: AccountStatus) => void;
-  resetPassword: (id: string, password?: string) => void;
+  addUser: (input: NewUserInput) => Promise<{ ok: true; user: SystemUser } | { ok: false; error: string }>;
+  addStudentsToParent: (parentId: string, children: NewChildInput[]) => Promise<{ ok: true } | { ok: false; error: string }>;
+  updateUser: (id: string, patch: Partial<SystemUser>) => Promise<{ ok: true } | { ok: false; error: string }>;
+  setUserStatus: (id: string, status: AccountStatus) => Promise<{ ok: true } | { ok: false; error: string }>;
+  resetPassword: (id: string, password: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   linkParentToStudent: (parentId: string, studentId: string) => void;
 
   addInvoice: (invoice: Omit<Invoice, "id">) => Invoice;
@@ -172,14 +186,18 @@ type Persisted = {
 function loadPersisted(): Persisted | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Persisted) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Persisted;
+    if (!parsed.users?.length) parsed.users = seedUsers;
+    return parsed;
   } catch {
     return null;
   }
 }
 
 function persist(data: Persisted) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const users = data.users.map((u) => ({ ...u, password: "" }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...data, users }));
 }
 
 function nextId(prefix: string, existing: string[]) {
@@ -248,67 +266,136 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const refreshUsers = useCallback(async () => {
+    const remote = await fetchProfiles();
+    if (!remote?.length) return;
+    commit((prev) => {
+      const previousByEmail = new Map(prev.users.map((u) => [u.email.toLowerCase(), u]));
+      return {
+        ...prev,
+        users: remote.map((u) => ({
+          ...u,
+          linkedStudentIds: previousByEmail.get(u.email.toLowerCase())?.linkedStudentIds ?? u.linkedStudentIds,
+        })),
+      };
+    });
+  }, [commit]);
+
+  useEffect(() => {
+    const sync = () => {
+      void refreshUsers();
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED")) {
+        // Defer so the client session is available for PostgREST (avoids an empty RLS result).
+        setTimeout(sync, 0);
+      }
+    });
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) sync();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [refreshUsers]);
+
   const addUser = useCallback(
-    (input: NewUserInput) => {
+    async (input: NewUserInput) => {
+      if (input.role === "student") {
+        return { ok: false as const, error: "Students can only be added when creating a parent account." };
+      }
       if (state.users.some((u) => u.email.toLowerCase() === input.email.trim().toLowerCase())) {
         return { ok: false as const, error: "An account with this email already exists." };
       }
-      const id = nextId("USR", state.users.map((u) => u.id));
-      const user: SystemUser = {
-        id,
-        name: input.name.trim(),
-        email: input.email.trim().toLowerCase(),
-        password: input.password || DEMO_PASSWORD,
-        role: input.role,
-        phone: input.phone.trim(),
-        status: "Active",
-        department: input.department,
-        title: input.title || input.role,
-        linkedStudentIds: input.linkedStudentIds ?? [],
-        createdAt: new Date().toISOString().slice(0, 10),
-      };
 
+      const children = input.role === "parent" ? (input.children ?? []).filter((c) => c.name.trim() && c.email.trim()) : [];
+      if (input.role === "parent" && children.length === 0) {
+        return { ok: false as const, error: "Add at least one student when creating a parent account." };
+      }
+
+      const usedEmails = new Set(state.users.map((u) => u.email.toLowerCase()));
+      usedEmails.add(input.email.trim().toLowerCase());
+      for (const child of children) {
+        const childEmail = child.email.trim().toLowerCase();
+        if (usedEmails.has(childEmail)) {
+          return { ok: false as const, error: `An account with this email already exists: ${childEmail}` };
+        }
+        usedEmails.add(childEmail);
+      }
+
+      const legacyId = nextId("USR", state.users.map((u) => u.id));
+      const email = input.email.trim().toLowerCase();
+
+      const { data: authId, error } = await supabase.rpc("admin_create_user", {
+        p_email: email,
+        p_password: input.password || generateTempPassword(),
+        p_full_name: input.name.trim(),
+        p_role: input.role,
+        p_phone: input.phone.trim(),
+        p_department: input.department ?? null,
+        p_title: input.role === "parent" ? ROLE_META.parent.label : (input.title || input.role) ?? null,
+        p_legacy_id: legacyId,
+      });
+
+      if (error || !authId) {
+        return { ok: false as const, error: publicError(error?.message ?? "Could not create the account.") };
+      }
+
+      const created = await fetchProfileByAuthId(String(authId));
+      if (!created) {
+        return { ok: false as const, error: "Account was created but the profile could not be loaded." };
+      }
+
+      let user = created;
       let nextStudents = state.students;
       let nextUsers = [...state.users];
       let nextGrades = state.grades;
+      const linkedIds: string[] = [];
 
-      if (input.role === "student") {
-        const sid = `KA-${2400 + state.students.length + 1}`;
-        const parent = state.users.find((u) => u.id === input.parentId);
-        const student: Student = {
-          id: sid,
-          name: user.name,
-          email: user.email,
-          class: input.studentClass || "JHS 1A",
-          gender: input.gender || "M",
-          parentId: input.parentId || "",
-          guardian: parent?.name || "—",
-          status: "Active",
-          attendance: 100,
-          gpa: 0,
-          feesOwed: 0,
-          avatarColor: "bg-brand-100 text-brand-700",
-        };
-        user.linkedStudentIds = [sid];
-        user.title = `${student.class} · ${sid}`;
-        nextStudents = [student, ...state.students];
-        nextGrades = [
-          ...seedGradesForStudents([{ id: sid, className: student.class }]),
-          ...state.grades,
-        ];
-        if (input.parentId) {
-          nextUsers = nextUsers.map((u) =>
-            u.id === input.parentId
-              ? { ...u, linkedStudentIds: Array.from(new Set([...(u.linkedStudentIds ?? []), sid])) }
-              : u,
-          );
+      if (input.role === "parent") {
+        for (const [index, child] of children.entries()) {
+          const childEmail = child.email.trim().toLowerCase();
+          const childLegacy = nextId("USR", [...nextUsers, user].map((u) => u.id));
+          const { data: childAuthId, error: childError } = await supabase.rpc("admin_create_user", {
+            p_email: childEmail,
+            p_password: child.password || input.password || generateTempPassword(),
+            p_full_name: child.name.trim(),
+            p_role: "student",
+            p_phone: input.phone.trim(),
+            p_department: null,
+            p_title: `${child.className} student`,
+            p_legacy_id: childLegacy,
+          });
+          if (childError || !childAuthId) {
+            return { ok: false as const, error: publicError(childError?.message ?? `Could not create student ${child.name}.`) };
+          }
+          const childUser = await fetchProfileByAuthId(String(childAuthId));
+          if (!childUser) {
+            return { ok: false as const, error: `Student ${child.name} was created but the profile could not be loaded.` };
+          }
+          const sid = `KA-${2400 + nextStudents.length + 1 + index}`;
+          const student: Student = {
+            id: sid,
+            name: childUser.name,
+            email: childUser.email,
+            class: child.className || "JHS 1A",
+            gender: child.gender || "M",
+            parentId: user.id,
+            guardian: user.name,
+            status: "Active",
+            attendance: 100,
+            gpa: 0,
+            feesOwed: 0,
+            avatarColor: "bg-brand-100 text-brand-700",
+          };
+          const titled = { ...childUser, linkedStudentIds: [sid], title: `${student.class} · ${sid}` };
+          if (titled.profileId) {
+            await supabase.from("profiles").update({ title: titled.title }).eq("id", titled.profileId);
+          }
+          linkedIds.push(sid);
+          nextUsers = [titled, ...nextUsers];
+          nextStudents = [student, ...nextStudents];
+          nextGrades = [...seedGradesForStudents([{ id: sid, className: student.class }]), ...nextGrades];
         }
-      }
-
-      if (input.role === "parent" && input.linkedStudentIds?.length) {
-        nextStudents = state.students.map((s) =>
-          input.linkedStudentIds!.includes(s.id) ? { ...s, parentId: id, guardian: user.name } : s,
-        );
+        user = { ...user, linkedStudentIds: linkedIds };
       }
 
       nextUsers = [user, ...nextUsers];
@@ -318,24 +405,153 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [state.users, state.students, state.grades, commit],
   );
 
+  const addStudentsToParent = useCallback(
+    async (parentId: string, children: NewChildInput[]) => {
+      const parent = state.users.find((u) => u.id === parentId);
+      if (!parent || parent.role !== "parent") {
+        return { ok: false as const, error: "Parent account not found." };
+      }
+      const drafts = children.filter((c) => c.name.trim() && c.email.trim());
+      if (drafts.length === 0) {
+        return { ok: false as const, error: "Add at least one student with a name and email." };
+      }
+
+      const usedEmails = new Set(state.users.map((u) => u.email.toLowerCase()));
+      for (const child of drafts) {
+        const childEmail = child.email.trim().toLowerCase();
+        if (usedEmails.has(childEmail)) {
+          return { ok: false as const, error: `An account with this email already exists: ${childEmail}` };
+        }
+        usedEmails.add(childEmail);
+      }
+
+      let nextStudents = state.students;
+      let nextUsers = [...state.users];
+      let nextGrades = state.grades;
+      const linkedIds = [...(parent.linkedStudentIds ?? [])];
+
+      for (const [index, child] of drafts.entries()) {
+        const childEmail = child.email.trim().toLowerCase();
+        const childLegacy = nextId("USR", nextUsers.map((u) => u.id));
+        const { data: childAuthId, error: childError } = await supabase.rpc("admin_create_user", {
+          p_email: childEmail,
+          p_password: child.password || generateTempPassword(),
+          p_full_name: child.name.trim(),
+          p_role: "student",
+          p_phone: parent.phone,
+          p_department: null,
+          p_title: `${child.className} student`,
+          p_legacy_id: childLegacy,
+        });
+        if (childError || !childAuthId) {
+          return { ok: false as const, error: publicError(childError?.message ?? `Could not create student ${child.name}.`) };
+        }
+        const childUser = await fetchProfileByAuthId(String(childAuthId));
+        if (!childUser) {
+          return { ok: false as const, error: `Student ${child.name} was created but the profile could not be loaded.` };
+        }
+        const sid = `KA-${2400 + nextStudents.length + 1 + index}`;
+        const student: Student = {
+          id: sid,
+          name: childUser.name,
+          email: childUser.email,
+          class: child.className || "JHS 1A",
+          gender: child.gender || "M",
+          parentId: parent.id,
+          guardian: parent.name,
+          status: "Active",
+          attendance: 100,
+          gpa: 0,
+          feesOwed: 0,
+          avatarColor: "bg-brand-100 text-brand-700",
+        };
+        const titled = { ...childUser, linkedStudentIds: [sid], title: `${student.class} · ${sid}` };
+        if (titled.profileId) {
+          await supabase.from("profiles").update({ title: titled.title }).eq("id", titled.profileId);
+        }
+        linkedIds.push(sid);
+        nextUsers = [titled, ...nextUsers];
+        nextStudents = [student, ...nextStudents];
+        nextGrades = [...seedGradesForStudents([{ id: sid, className: student.class }]), ...nextGrades];
+      }
+
+      nextUsers = nextUsers.map((u) => (u.id === parent.id ? { ...u, linkedStudentIds: linkedIds } : u));
+      commit((prev) => ({ ...prev, users: nextUsers, students: nextStudents, grades: nextGrades }));
+      return { ok: true as const };
+    },
+    [state.users, state.students, state.grades, commit],
+  );
+
   const updateUser = useCallback(
-    (id: string, patch: Partial<SystemUser>) => {
+    async (id: string, patch: Partial<SystemUser>) => {
+      const existing = state.users.find((u) => u.id === id);
+      if (existing?.profileId) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            full_name: patch.name ?? existing.name,
+            email: patch.email ?? existing.email,
+            phone: patch.phone ?? existing.phone,
+            department: patch.department ?? existing.department ?? null,
+            title: patch.title ?? existing.title ?? null,
+          })
+          .eq("id", existing.profileId);
+        if (error) return { ok: false as const, error: publicError(error.message) };
+      }
       commit((prev) => ({
         ...prev,
-        users: prev.users.map((u) => (u.id === id ? { ...u, ...patch, id: u.id } : u)),
+        users: prev.users.map((u) => (u.id === id ? { ...u, ...patch, id: u.id, password: "" } : u)),
       }));
+      return { ok: true as const };
     },
-    [commit],
+    [state.users, commit],
   );
 
   const setUserStatus = useCallback(
-    (id: string, status: AccountStatus) => updateUser(id, { status }),
-    [updateUser],
+    async (id: string, status: AccountStatus) => {
+      const existing = state.users.find((u) => u.id === id);
+      if (existing?.isSuperAdmin && status !== "Active") {
+        return { ok: false as const, error: "The super admin account cannot be suspended." };
+      }
+      if (existing?.profileId) {
+        const { error } = await supabase.rpc("admin_set_user_status", {
+          p_profile_id: existing.profileId,
+          p_status: status,
+        });
+        if (error) return { ok: false as const, error: publicError(error.message) };
+      }
+      commit((prev) => ({
+        ...prev,
+        users: prev.users.map((u) => (u.id === id ? { ...u, status } : u)),
+      }));
+      return { ok: true as const };
+    },
+    [state.users, commit],
   );
 
   const resetPassword = useCallback(
-    (id: string, password = DEMO_PASSWORD) => updateUser(id, { password }),
-    [updateUser],
+    async (id: string, password: string) => {
+      const existing = state.users.find((u) => u.id === id);
+      let profileId = existing?.profileId;
+      if (!profileId && existing?.email) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", existing.email.toLowerCase())
+          .maybeSingle();
+        profileId = data?.id;
+      }
+      if (!profileId) {
+        return { ok: false as const, error: "This account is not linked to the school database yet." };
+      }
+      const { error } = await supabase.rpc("admin_reset_password", {
+        p_profile_id: profileId,
+        p_password: password,
+      });
+      if (error) return { ok: false as const, error: publicError(error.message) };
+      return { ok: true as const };
+    },
+    [state.users],
   );
 
   const linkParentToStudent = useCallback(
@@ -439,7 +655,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         class: className,
         gender: "M",
         parentId: "",
-        guardian: app.guardian || "—",
+        guardian: app.guardian || "None",
         status: "Active",
         attendance: 100,
         gpa: 0,
@@ -864,6 +1080,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     () => ({
       ...state,
       addUser,
+      addStudentsToParent,
       updateUser,
       setUserStatus,
       resetPassword,
@@ -907,6 +1124,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [
       state,
       addUser,
+      addStudentsToParent,
       updateUser,
       setUserStatus,
       resetPassword,
