@@ -1,10 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./env";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export { isSupabaseConfigured };
 
-if (!url || !anonKey) {
-  throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env.local");
-}
-
-export const supabase = createClient(url, anonKey);
+export const supabase = createClient(
+  supabaseUrl || "https://unavailable.supabase.co",
+  supabaseAnonKey || "unavailable",
+);

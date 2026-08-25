@@ -23,6 +23,8 @@ npm run build    # type-check + production build
 
 Sign in with **role + email + password**. Every login is authenticated against Supabase Auth. Accounts are created by the school admin under Users & Roles.
 
+Copy `.env.example` to `.env.local` and fill `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. On Vercel, set the same variables (Production) and **Redeploy** — Vite inlines them at build time. Without them the deployed site is a blank page.
+
 ## Portals & pages
 
 | Portal | Routes |
