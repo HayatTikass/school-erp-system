@@ -31,7 +31,7 @@ export default function ParentProgress() {
   return (
     <div>
       <PageHeader
-        title={selectedChild ? `Academic Progress — ${selectedChild.name.split(" ")[0]}` : "Academic Progress"}
+        title={selectedChild ? `Academic Progress · ${selectedChild.name.split(" ")[0]}` : "Academic Progress"}
         subtitle="Grades, GPA trend and teacher remarks per term."
         actions={
           children.length > 0 ? (
@@ -56,8 +56,8 @@ export default function ParentProgress() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Term GPA" value={selectedChild.gpa.toFixed(1)} delta="this term" deltaLabel="" />
             <StatCard label="Class" value={selectedChild.class} delta={selectedChild.id} deltaLabel="" iconBg="bg-warning-50 text-warning-600" />
-            <StatCard label="Strongest subject" value={best?.subject ?? "—"} delta={best ? `${best.total}%` : ""} deltaLabel="" iconBg="bg-success-50 text-success-600" />
-            <StatCard label="Focus area" value={weakest?.subject ?? "—"} delta={weakest ? `${weakest.total}%` : ""} deltaLabel="needs support" positive={false} iconBg="bg-error-50 text-error-600" />
+            <StatCard label="Strongest subject" value={best?.subject ?? "None"} delta={best ? `${best.total}%` : ""} deltaLabel="" iconBg="bg-success-50 text-success-600" />
+            <StatCard label="Focus area" value={weakest?.subject ?? "None"} delta={weakest ? `${weakest.total}%` : ""} deltaLabel="needs support" positive={false} iconBg="bg-error-50 text-error-600" />
           </div>
 
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -96,7 +96,7 @@ export default function ParentProgress() {
           </div>
 
           <Card className="mt-6">
-            <CardHeader title="Term 3 results in detail" subtitle={`Average: ${avgScore ? avgScore.toFixed(1) : "—"}%`} />
+            <CardHeader title="Term 3 results in detail" subtitle={`Average: ${avgScore ? avgScore.toFixed(1) : "None"}%`} />
             {childGrades.length === 0 ? (
               <p className="px-5 pb-5 text-sm text-gray-500">Grades will appear here once approved by the school.</p>
             ) : (

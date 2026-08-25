@@ -24,7 +24,7 @@ export default function TransportRoutes() {
     addRoute({
       name: form.name.trim(),
       driver: form.driver.trim(),
-      vehicle: form.vehicle.trim() || "—",
+      vehicle: form.vehicle.trim() || "None",
       students: Number(form.students) || 0,
       fee: Number(form.fee) || 0,
       status: form.status,
@@ -69,8 +69,8 @@ export default function TransportRoutes() {
             </div>
             <h3 className="mt-4 text-base font-bold text-gray-900">{r.name}</h3>
             <div className="mt-3 space-y-2 text-sm text-gray-600">
-              <p>Driver — <span className="font-medium text-gray-900">{r.driver}</span></p>
-              <p>Vehicle — <span className="font-medium text-gray-900">{r.vehicle}</span></p>
+              <p>Driver · <span className="font-medium text-gray-900">{r.driver}</span></p>
+              <p>Vehicle · <span className="font-medium text-gray-900">{r.vehicle}</span></p>
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
               <span className="text-sm text-gray-500">{r.students} students</span>
@@ -94,7 +94,7 @@ export default function TransportRoutes() {
       >
         <div className="space-y-4">
           <Field label="Route name" required>
-            <input className={inputClass} placeholder="e.g. Route 4 — East Legon" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input className={inputClass} placeholder="e.g. Route 4 · East Legon" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="Driver" required>
             <input className={inputClass} value={form.driver} onChange={(e) => setForm({ ...form, driver: e.target.value })} />

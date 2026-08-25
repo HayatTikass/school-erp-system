@@ -55,14 +55,14 @@ export type Staff = {
 };
 
 export const staff: Staff[] = [
-  { id: "ST-101", name: "Mr. Daniel Ampofo", role: "Teacher — Mathematics", department: "Sciences", email: "d.ampofo@kingsford.edu.gh", phone: "024 555 0101", status: "Active", salary: 4200 },
-  { id: "ST-102", name: "Mrs. Grace Antwi", role: "Teacher — English", department: "Languages", email: "g.antwi@kingsford.edu.gh", phone: "024 555 0102", status: "Active", salary: 4100 },
-  { id: "ST-103", name: "Mr. Samuel Tetteh", role: "Teacher — Integrated Science", department: "Sciences", email: "s.tetteh@kingsford.edu.gh", phone: "024 555 0103", status: "On leave", salary: 4300 },
-  { id: "ST-104", name: "Ms. Comfort Addo", role: "Teacher — Social Studies", department: "Humanities", email: "c.addo@kingsford.edu.gh", phone: "024 555 0104", status: "Active", salary: 3950 },
+  { id: "ST-101", name: "Mr. Daniel Ampofo", role: "Teacher · Mathematics", department: "Sciences", email: "d.ampofo@kingsford.edu.gh", phone: "024 555 0101", status: "Active", salary: 4200 },
+  { id: "ST-102", name: "Mrs. Grace Antwi", role: "Teacher · English", department: "Languages", email: "g.antwi@kingsford.edu.gh", phone: "024 555 0102", status: "Active", salary: 4100 },
+  { id: "ST-103", name: "Mr. Samuel Tetteh", role: "Teacher · Integrated Science", department: "Sciences", email: "s.tetteh@kingsford.edu.gh", phone: "024 555 0103", status: "On leave", salary: 4300 },
+  { id: "ST-104", name: "Ms. Comfort Addo", role: "Teacher · Social Studies", department: "Humanities", email: "c.addo@kingsford.edu.gh", phone: "024 555 0104", status: "Active", salary: 3950 },
   { id: "ST-105", name: "Mr. Isaac Quartey", role: "Bursar", department: "Finance", email: "i.quartey@kingsford.edu.gh", phone: "024 555 0105", status: "Active", salary: 5200 },
   { id: "ST-106", name: "Mrs. Vida Lartey", role: "Librarian", department: "Library", email: "v.lartey@kingsford.edu.gh", phone: "024 555 0106", status: "Active", salary: 3100 },
   { id: "ST-107", name: "Mr. Eric Nkrumah", role: "Driver", department: "Transport", email: "e.nkrumah@kingsford.edu.gh", phone: "024 555 0107", status: "Active", salary: 2400 },
-  { id: "ST-108", name: "Ms. Josephine Baah", role: "Teacher — ICT", department: "Sciences", email: "j.baah@kingsford.edu.gh", phone: "024 555 0108", status: "Active", salary: 4150 },
+  { id: "ST-108", name: "Ms. Josephine Baah", role: "Teacher · ICT", department: "Sciences", email: "j.baah@kingsford.edu.gh", phone: "024 555 0108", status: "Active", salary: 4150 },
 ];
 
 /* --------------------------- Academics ---------------------------- */
@@ -88,13 +88,13 @@ export const subjects = [
 export type TimetableSlot = { time: string; mon: string; tue: string; wed: string; thu: string; fri: string };
 
 export const timetable: TimetableSlot[] = [
-  { time: "7:30 – 8:10", mon: "Mathematics", tue: "English", wed: "Science", thu: "Mathematics", fri: "ICT" },
-  { time: "8:10 – 8:50", mon: "Mathematics", tue: "English", wed: "Science", thu: "Social Studies", fri: "ICT" },
-  { time: "8:50 – 9:30", mon: "English", tue: "Science", wed: "Mathematics", thu: "Social Studies", fri: "RME" },
-  { time: "9:30 – 9:50", mon: "Break", tue: "Break", wed: "Break", thu: "Break", fri: "Break" },
-  { time: "9:50 – 10:30", mon: "Science", tue: "Mathematics", wed: "English", thu: "ICT", fri: "Mathematics" },
-  { time: "10:30 – 11:10", mon: "Social Studies", tue: "RME", wed: "English", thu: "ICT", fri: "English" },
-  { time: "11:10 – 11:50", mon: "ICT", tue: "Social Studies", wed: "RME", thu: "Science", fri: "Sports" },
+  { time: "7:30 to 8:10", mon: "Mathematics", tue: "English", wed: "Science", thu: "Mathematics", fri: "ICT" },
+  { time: "8:10 to 8:50", mon: "Mathematics", tue: "English", wed: "Science", thu: "Social Studies", fri: "ICT" },
+  { time: "8:50 to 9:30", mon: "English", tue: "Science", wed: "Mathematics", thu: "Social Studies", fri: "RME" },
+  { time: "9:30 to 9:50", mon: "Break", tue: "Break", wed: "Break", thu: "Break", fri: "Break" },
+  { time: "9:50 to 10:30", mon: "Science", tue: "Mathematics", wed: "English", thu: "ICT", fri: "Mathematics" },
+  { time: "10:30 to 11:10", mon: "Social Studies", tue: "RME", wed: "English", thu: "ICT", fri: "English" },
+  { time: "11:10 to 11:50", mon: "ICT", tue: "Social Studies", wed: "RME", thu: "Science", fri: "Sports" },
 ];
 
 export type Grade = { subject: string; class: string; test1: number; test2: number; exam: number; total: number; grade: string; remark: string };
@@ -124,7 +124,7 @@ export type Assignment = {
 export const assignments: Assignment[] = [
   { id: "A1", title: "Quadratic equations worksheet", subject: "Mathematics", class: "JHS 2A", due: "2026-07-08", submitted: 21, totalStudents: 34, status: "Open", myStatus: "Submitted" },
   { id: "A2", title: "Essay: My community and I", subject: "English Language", class: "JHS 2A", due: "2026-07-06", submitted: 30, totalStudents: 34, status: "Grading", myStatus: "Graded", score: "17/20" },
-  { id: "A3", title: "Lab report — photosynthesis", subject: "Integrated Science", class: "JHS 2A", due: "2026-07-10", submitted: 8, totalStudents: 34, status: "Open", myStatus: "Pending" },
+  { id: "A3", title: "Lab report · photosynthesis", subject: "Integrated Science", class: "JHS 2A", due: "2026-07-10", submitted: 8, totalStudents: 34, status: "Open", myStatus: "Pending" },
   { id: "A4", title: "Map reading exercise", subject: "Social Studies", class: "JHS 2A", due: "2026-07-04", submitted: 33, totalStudents: 34, status: "Closed", myStatus: "Late", score: "12/20" },
   { id: "A5", title: "Build a simple HTML page", subject: "ICT", class: "JHS 2A", due: "2026-07-12", submitted: 3, totalStudents: 34, status: "Open", myStatus: "Pending" },
 ];
@@ -146,7 +146,7 @@ export const invoices: Invoice[] = [
   { id: "INV-1041", student: "Abena Osei", class: "JHS 2A", item: "Term 3 Tuition", amount: 1850, paid: 1850, due: "2026-05-15", status: "Paid" },
   { id: "INV-1042", student: "Kojo Mensah", class: "JHS 2A", item: "Term 3 Tuition", amount: 1850, paid: 1400, due: "2026-05-15", status: "Partial" },
   { id: "INV-1043", student: "Kwabena Asante", class: "JHS 2B", item: "Term 3 Tuition", amount: 1850, paid: 650, due: "2026-05-15", status: "Overdue" },
-  { id: "INV-1044", student: "Adwoa Owusu", class: "JHS 2B", item: "Bus Fee — Term 3", amount: 300, paid: 0, due: "2026-06-01", status: "Unpaid" },
+  { id: "INV-1044", student: "Adwoa Owusu", class: "JHS 2B", item: "Bus Fee · Term 3", amount: 300, paid: 0, due: "2026-06-01", status: "Unpaid" },
   { id: "INV-1045", student: "Esi Amoah", class: "JHS 3A", item: "Term 3 Tuition", amount: 1950, paid: 1950, due: "2026-05-15", status: "Paid" },
   { id: "INV-1046", student: "Kofi Adjei", class: "JHS 3A", item: "Term 3 Tuition + Exam Fee", amount: 2150, paid: 0, due: "2026-05-15", status: "Overdue" },
   { id: "INV-1047", student: "Yaw Darko", class: "JHS 1A", item: "Term 3 Tuition", amount: 1750, paid: 950, due: "2026-05-15", status: "Partial" },
@@ -215,19 +215,19 @@ export const borrowedBooks = [
 /* --------------------------- Transport ---------------------------- */
 
 export const busRoutes = [
-  { id: "RT-1", name: "Route 1 — East Legon Loop", driver: "Mr. Eric Nkrumah", vehicle: "GS 4521-24 (Coaster)", students: 28, fee: 300, status: "Active" },
-  { id: "RT-2", name: "Route 2 — Madina / Adenta", driver: "Mr. Joseph Larbi", vehicle: "GS 3310-23 (Sprinter)", students: 22, fee: 350, status: "Active" },
-  { id: "RT-3", name: "Route 3 — Spintex Road", driver: "Mr. Felix Owusu", vehicle: "GS 7789-22 (Coaster)", students: 31, fee: 320, status: "Maintenance" },
+  { id: "RT-1", name: "Route 1 · East Legon Loop", driver: "Mr. Eric Nkrumah", vehicle: "GS 4521-24 (Coaster)", students: 28, fee: 300, status: "Active" },
+  { id: "RT-2", name: "Route 2 · Madina / Adenta", driver: "Mr. Joseph Larbi", vehicle: "GS 3310-23 (Sprinter)", students: 22, fee: 350, status: "Active" },
+  { id: "RT-3", name: "Route 3 · Spintex Road", driver: "Mr. Felix Owusu", vehicle: "GS 7789-22 (Coaster)", students: 31, fee: 320, status: "Maintenance" },
 ];
 
 /* ------------------------ Assets & inventory ---------------------- */
 
 export const assets = [
   { id: "AST-101", name: "HP ProBook laptops", category: "ICT Equipment", qty: 24, location: "ICT Lab", condition: "Good", value: 96000 },
-  { id: "AST-102", name: "Classroom desks (dual)", category: "Furniture", qty: 180, location: "Blocks A–C", condition: "Fair", value: 54000 },
+  { id: "AST-102", name: "Classroom desks (dual)", category: "Furniture", qty: 180, location: "Blocks A to C", condition: "Fair", value: 54000 },
   { id: "AST-103", name: "Science lab kits", category: "Lab Equipment", qty: 15, location: "Science Lab", condition: "Good", value: 22500 },
   { id: "AST-104", name: "Projectors (Epson)", category: "ICT Equipment", qty: 6, location: "Staff Room Store", condition: "Good", value: 18000 },
-  { id: "AST-105", name: "School bus — Coaster", category: "Vehicle", qty: 2, location: "Car Park", condition: "Needs service", value: 480000 },
+  { id: "AST-105", name: "School bus · Coaster", category: "Vehicle", qty: 2, location: "Car Park", condition: "Needs service", value: 480000 },
 ];
 
 /* ------------------------- Communication -------------------------- */
@@ -235,11 +235,11 @@ export const assets = [
 export type Notice = { id: string; title: string; body: string; audience: string; date: string; tag: "Event" | "Academic" | "Finance" | "General" };
 
 export const notices: Notice[] = [
-  { id: "N-1", title: "PTA meeting — Saturday 18 July", body: "All parents are invited to the Term 3 PTA meeting at the assembly hall, 9:00 AM. Agenda includes exam preparation and the building project levy.", audience: "Parents", date: "2026-07-03", tag: "Event" },
+  { id: "N-1", title: "PTA meeting · Saturday 18 July", body: "All parents are invited to the Term 3 PTA meeting at the assembly hall, 9:00 AM. Agenda includes exam preparation and the building project levy.", audience: "Parents", date: "2026-07-03", tag: "Event" },
   { id: "N-2", title: "End-of-term exams begin 27 July", body: "Term 3 examinations run from 27 July to 5 August. The timetable has been published to student and parent portals.", audience: "Everyone", date: "2026-07-02", tag: "Academic" },
   { id: "N-3", title: "Fee payment deadline extended", body: "The deadline for outstanding Term 3 fees has been extended to 15 July. MoMo and bank payment options remain available.", audience: "Parents", date: "2026-06-30", tag: "Finance" },
   { id: "N-4", title: "Inter-house sports day", body: "The annual inter-house athletics competition takes place on 11 July at the school park. Students should come in house colours.", audience: "Students", date: "2026-06-28", tag: "Event" },
-  { id: "N-5", title: "Library week — donate a book", body: "As part of library week, each class is encouraged to donate at least 5 storybooks to the school library.", audience: "Everyone", date: "2026-06-25", tag: "General" },
+  { id: "N-5", title: "Library week · donate a book", body: "As part of library week, each class is encouraged to donate at least 5 storybooks to the school library.", audience: "Everyone", date: "2026-06-25", tag: "General" },
 ];
 
 export type Message = { id: string; from: string; role: string; preview: string; time: string; unread: boolean; avatarColor: string };
@@ -248,7 +248,7 @@ export const messages: Message[] = [
   { id: "MSG-1", from: "Mrs. Grace Antwi", role: "English Teacher", preview: "Abena has shown remarkable improvement in her essays this term…", time: "10:24 AM", unread: true, avatarColor: "bg-brand-100 text-brand-700" },
   { id: "MSG-2", from: "Mr. Daniel Ampofo", role: "Maths Teacher", preview: "Reminder: the quadratic equations worksheet is due Wednesday.", time: "Yesterday", unread: true, avatarColor: "bg-blue-100 text-blue-700" },
   { id: "MSG-3", from: "Admin Office", role: "Administration", preview: "Your Term 3 invoice has been updated. Kindly check the fees page.", time: "Yesterday", unread: false, avatarColor: "bg-gray-100 text-gray-700" },
-  { id: "MSG-4", from: "Kwame Osei", role: "Parent — Abena Osei", preview: "Thank you for the update on the science project. We will…", time: "Mon", unread: false, avatarColor: "bg-success-100 text-success-700" },
+  { id: "MSG-4", from: "Kwame Osei", role: "Parent · Abena Osei", preview: "Thank you for the update on the science project. We will…", time: "Mon", unread: false, avatarColor: "bg-success-100 text-success-700" },
   { id: "MSG-5", from: "Ms. Josephine Baah", role: "ICT Teacher", preview: "The ICT lab session moves to Thursday this week due to…", time: "Mon", unread: false, avatarColor: "bg-pink-100 text-pink-700" },
 ];
 
@@ -274,18 +274,18 @@ export const applications = [
 /* ------------------------- Lesson planning ------------------------ */
 
 export const lessonPlans = [
-  { id: "LP-1", topic: "Quadratic equations — factorisation", subject: "Mathematics", class: "JHS 2A", week: "Week 9", status: "Completed", resources: 3 },
-  { id: "LP-2", topic: "Quadratic equations — formula method", subject: "Mathematics", class: "JHS 2A", week: "Week 10", status: "In progress", resources: 2 },
+  { id: "LP-1", topic: "Quadratic equations · factorisation", subject: "Mathematics", class: "JHS 2A", week: "Week 9", status: "Completed", resources: 3 },
+  { id: "LP-2", topic: "Quadratic equations · formula method", subject: "Mathematics", class: "JHS 2A", week: "Week 10", status: "In progress", resources: 2 },
   { id: "LP-3", topic: "Simultaneous linear equations", subject: "Mathematics", class: "JHS 2B", week: "Week 10", status: "In progress", resources: 4 },
-  { id: "LP-4", topic: "Probability — basic concepts", subject: "Mathematics", class: "JHS 3A", week: "Week 11", status: "Draft", resources: 1 },
-  { id: "LP-5", topic: "Statistics — mean, median, mode", subject: "Mathematics", class: "JHS 3B", week: "Week 11", status: "Draft", resources: 0 },
+  { id: "LP-4", topic: "Probability · basic concepts", subject: "Mathematics", class: "JHS 3A", week: "Week 11", status: "Draft", resources: 1 },
+  { id: "LP-5", topic: "Statistics · mean, median, mode", subject: "Mathematics", class: "JHS 3B", week: "Week 11", status: "Draft", resources: 0 },
 ];
 
 /* ----------------------------- Users ------------------------------ */
 
 export const auditLog = [
   { id: 1, actor: "Mrs. Akosua Danquah", action: "Approved Term 3 report cards for JHS 3A", time: "Today, 9:41 AM" },
-  { id: 2, actor: "Mr. Isaac Quartey", action: "Recorded MoMo payment of GH₵ 950 — Yaw Darko", time: "Today, 8:15 AM" },
+  { id: 2, actor: "Mr. Isaac Quartey", action: "Recorded MoMo payment of GH₵ 950 · Yaw Darko", time: "Today, 8:15 AM" },
   { id: 3, actor: "System", action: "Nightly backup completed successfully", time: "Today, 2:00 AM" },
   { id: 4, actor: "Mrs. Grace Antwi", action: "Submitted JHS 2A English grades for approval", time: "Yesterday, 4:32 PM" },
   { id: 5, actor: "Mrs. Vida Lartey", action: "Issued 'Things Fall Apart' to Abena Osei", time: "Yesterday, 1:07 PM" },

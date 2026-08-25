@@ -77,7 +77,7 @@ export default function StudentAttendance() {
 
   return (
     <div>
-      <PageHeader title="My Attendance" subtitle={`Term 3 attendance — ${student.name}, ${student.class}.`} />
+      <PageHeader title="My Attendance" subtitle={`Term 3 attendance · ${student.name}, ${student.class}.`} />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Term attendance" value={`${displayPct}%`} delta={myRecords.length ? "from daily records" : "from term summary"} deltaLabel="" icon={<CheckmarkCircle02Icon size={20} />} iconBg="bg-success-50 text-success-600" />

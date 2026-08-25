@@ -10,7 +10,7 @@ export default function FinanceFeeStructure() {
       />
 
       <Card>
-        <CardHeader title="Fee structure" subtitle="Per-term rates for JHS 1 – JHS 3" />
+        <CardHeader title="Fee structure" subtitle="Per-term rates for JHS 1 to JHS 3" />
         <Table>
           <THead cols={["Fee item", "JHS 1", "JHS 2", "JHS 3", "Frequency"]} />
           <tbody>

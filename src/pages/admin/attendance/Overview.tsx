@@ -36,7 +36,7 @@ export default function AttendanceOverview() {
     if (parent) {
       toast(`Absence alert sent to ${parent.name} (${parent.phone})`);
     } else {
-      toast(`No parent linked for ${studentName} — notification queued`, "warning");
+      toast(`No parent linked for ${studentName} · notification queued`, "warning");
     }
   };
 
@@ -55,7 +55,7 @@ export default function AttendanceOverview() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard
           label="Attendance today"
-          value={attendanceTodayPct !== null ? `${attendanceTodayPct}%` : "—"}
+          value={attendanceTodayPct !== null ? `${attendanceTodayPct}%` : "None"}
           delta={todayRecords.length > 0 ? `${presentToday} / ${todayRecords.length} present` : "No records yet"}
           deltaLabel=""
         />
@@ -80,13 +80,13 @@ export default function AttendanceOverview() {
         </Card>
 
         <Card>
-          <CardHeader title={latestDate ? `By class — ${formatDate(latestDate)}` : "By class today"} />
+          <CardHeader title={latestDate ? `By class · ${formatDate(latestDate)}` : "By class today"} />
           <div className="space-y-4 p-5">
             {classRates.map((c) => (
               <div key={c.name}>
                 <div className="mb-1 flex justify-between text-sm">
                   <span className="font-medium text-gray-700">{c.name}</span>
-                  <span className="font-semibold text-gray-900">{c.rate > 0 ? `${c.rate}%` : "—"}</span>
+                  <span className="font-semibold text-gray-900">{c.rate > 0 ? `${c.rate}%` : "None"}</span>
                 </div>
                 <Progress value={c.rate || 0} tone={attendanceTone(c.rate || 0)} />
               </div>
@@ -106,7 +106,7 @@ export default function AttendanceOverview() {
                   <TCell className="font-semibold text-gray-900">{a.studentName}</TCell>
                   <TCell>{a.className}</TCell>
                   <TCell><Badge tone={statusTone(a.mark)}>{a.mark}</Badge></TCell>
-                  <TCell>{a.submittedBy || "—"}</TCell>
+                  <TCell>{a.submittedBy || "None"}</TCell>
                 </TRow>
               ))}
             </tbody>

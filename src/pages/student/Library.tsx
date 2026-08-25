@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Book02Icon, Alert01Icon } from "hugeicons-react";
 import { PageHeader, Card, CardHeader, Badge, statusTone, Button, Table, THead, TRow, TCell, SearchInput, Select, StatCard } from "../../components/ui";
 import { formatMoney, formatDate } from "../../lib/utils";
@@ -10,6 +10,23 @@ export default function StudentLibrary() {
   const student = useCurrentStudent();
   const { loans, books, renewLoan } = useAppStore();
   const { toast } = useToast();
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All categories");
+
+  const categories = useMemo(
+    () => ["All categories", ...Array.from(new Set(books.map((b) => b.category))).sort()],
+    [books],
+  );
+
+  const visibleBooks = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return books.filter((b) => {
+      const matchesQuery =
+        !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+      const matchesCategory = category === "All categories" || b.category === category;
+      return matchesQuery && matchesCategory;
+    });
+  }, [books, query, category]);
 
   const myLoans = useMemo(
     () => (student ? loans.filter((l) => l.student === student.name) : []),
@@ -31,7 +48,7 @@ export default function StudentLibrary() {
 
   return (
     <div>
-      <PageHeader title="Library" subtitle={`Browse the catalogue, track loans and fines — ${student.name}.`} />
+      <PageHeader title="Library" subtitle={`Browse the catalogue, track loans and fines · ${student.name}.`} />
 
       {overdue && (
         <Card className="border-error-200 bg-error-25 p-5">
@@ -43,7 +60,7 @@ export default function StudentLibrary() {
               <div>
                 <p className="text-sm font-bold text-gray-900">"{overdue.book}" is overdue</p>
                 <p className="text-sm text-gray-600">
-                  Due {formatDate(overdue.due)} — return or renew to stop fines (currently {formatMoney(overdue.fine)}).
+                  Due {formatDate(overdue.due)} · return or renew to stop fines (currently {formatMoney(overdue.fine)}).
                 </p>
               </div>
             </div>
@@ -64,13 +81,25 @@ export default function StudentLibrary() {
         <Card className="xl:col-span-2">
           <CardHeader title="Book catalogue" subtitle="Reserve a copy and pick it up at the library" />
           <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-5 py-3.5">
-            <SearchInput placeholder="Search title or author…" className="w-72" />
-            <Select options={["All categories", "Literature", "Mathematics", "English", "Science", "ICT"]} />
+            <SearchInput
+              placeholder="Search title or author…"
+              className="w-72"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Select options={categories} value={category} onChange={setCategory} />
           </div>
           <Table>
             <THead cols={["Title", "Category", "Available", ""]} />
             <tbody>
-              {books.map((b) => (
+              {visibleBooks.length === 0 && (
+                <TRow>
+                  <TCell colSpan={4} className="py-8 text-center text-gray-400">
+                    No books match your search.
+                  </TCell>
+                </TRow>
+              )}
+              {visibleBooks.map((b) => (
                 <TRow key={b.id}>
                   <TCell>
                     <p className="font-semibold text-gray-900">{b.title}</p>
@@ -85,7 +114,7 @@ export default function StudentLibrary() {
                       variant="secondary"
                       size="sm"
                       disabled={b.available === 0}
-                      onClick={() => toast(`Reservation placed for "${b.title}" — pick up within 3 days`, "info")}
+                      onClick={() => toast(`Reservation placed for "${b.title}" · pick up within 3 days`, "info")}
                     >
                       Reserve
                     </Button>

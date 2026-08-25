@@ -75,14 +75,14 @@ export default function ParentFees() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <StatCard label="Outstanding balance" value={formatMoney(outstanding)} delta={outstanding > 0 ? "balance due" : "all clear"} deltaLabel="" positive={outstanding === 0} icon={<Wallet01Icon size={20} />} iconBg={outstanding > 0 ? "bg-error-50 text-error-600" : "bg-success-50 text-success-600"} />
             <StatCard label="Paid this year" value={formatMoney(paidThisYear)} delta={`${familyPayments.length} payments`} deltaLabel="" iconBg="bg-success-50 text-success-600" />
-            <StatCard label="Next due date" value={nextDue ? formatDate(nextDue.due).split(" ").slice(0, 2).join(" ") : "—"} delta={nextDue?.item ?? "no dues"} deltaLabel="" iconBg="bg-warning-50 text-warning-600" />
+            <StatCard label="Next due date" value={nextDue ? formatDate(nextDue.due).split(" ").slice(0, 2).join(" ") : "None"} delta={nextDue?.item ?? "no dues"} deltaLabel="" iconBg="bg-warning-50 text-warning-600" />
           </div>
 
           {outstanding > 0 && outstandingInvoice && (
             <Card className="mt-6 border-brand-200 bg-brand-25">
               <div className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <div>
-                  <p className="text-base font-bold text-gray-900">Pay outstanding balance — {formatMoney(outstanding)}</p>
+                  <p className="text-base font-bold text-gray-900">Pay outstanding balance · {formatMoney(outstanding)}</p>
                   <p className="mt-0.5 text-sm text-gray-600">
                     {outstandingInvoice.student}'s {outstandingInvoice.item}. Choose a payment method below.
                   </p>

@@ -58,7 +58,7 @@ export default function StudentDashboard() {
     <div>
       <PageHeader
         title={`Hi ${firstName} 👋`}
-        subtitle={`${student.class} — ${pending.length} assignment${pending.length === 1 ? "" : "s"} pending${nextDue ? `, next due ${formatDate(nextDue.assignment.due)}` : ""}.`}
+        subtitle={`${student.class} · ${pending.length} assignment${pending.length === 1 ? "" : "s"} pending${nextDue ? `, next due ${formatDate(nextDue.assignment.due)}` : ""}.`}
         actions={<Link to="/student/assignments"><Button icon={<ArrowRight01Icon size={18} />}>View assignments</Button></Link>}
       />
 
@@ -82,7 +82,7 @@ export default function StudentDashboard() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-900">{slot.mon}</p>
-                    <p className="text-xs text-gray-500">{subj?.teacher ?? "—"}</p>
+                    <p className="text-xs text-gray-500">{subj?.teacher ?? "None"}</p>
                   </div>
                   <span className="flex items-center gap-1.5 text-sm text-gray-500"><Clock01Icon size={15} /> {slot.time}</span>
                 </div>

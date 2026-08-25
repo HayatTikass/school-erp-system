@@ -10,6 +10,7 @@ import {
   ViewOffSlashIcon,
 } from "hugeicons-react";
 import { school } from "../data/mock";
+import loginHeroBg from "../assets/login-hero-bg.png";
 import { Button } from "../components/ui";
 import { ROLES, ROLE_META, type Role } from "../types/roles";
 import { useAuth } from "../auth/AuthContext";
@@ -22,6 +23,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -33,18 +35,18 @@ export default function Login() {
     setError("");
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = login(email, password, role);
+    const result = await login(email, password, role, remember);
     setLoading(false);
     if (!result.ok) {
       setError(result.error);
       toast(result.error, "error");
       return;
     }
-    toast(`Welcome back — signed in as ${ROLE_META[role].label}`);
+    toast(`Welcome back · signed in as ${ROLE_META[role].label}`);
     navigate(ROLE_META[role].portalPath);
   };
 
@@ -130,7 +132,12 @@ export default function Login() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600">
-                <input type="checkbox" defaultChecked className="size-4 rounded border-gray-300 accent-brand-600" />
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="size-4 rounded border-gray-300 accent-brand-600"
+                />
                 Remember me
               </label>
               <button
@@ -153,25 +160,25 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="relative hidden flex-1 overflow-hidden bg-brand-800 lg:block">
-        <div className="absolute -top-24 -right-24 size-96 rounded-full bg-brand-600/40 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 size-105 rounded-full bg-brand-500/30 blur-3xl" />
+      <div className="relative hidden flex-1 overflow-hidden lg:block">
+        <img
+          src={loginHeroBg}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-950/90 via-brand-900/75 to-brand-800/55" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(127,86,217,0.35),transparent_55%)]" />
         <div className="relative flex h-full flex-col justify-center px-16 xl:px-24">
-          <p className="text-sm font-semibold tracking-widest text-brand-200 uppercase">School ERP · {school.year}</p>
+          <p className="text-sm font-semibold tracking-widest text-brand-200 uppercase">
+            {school.name} · {school.year}
+          </p>
           <h2 className="mt-4 max-w-lg text-4xl leading-tight font-bold text-white xl:text-5xl">
-            Eight roles. One school system.
+            {school.motto}
           </h2>
           <p className="mt-5 max-w-md text-lg text-brand-100">
-            Admin, Headmaster, Accountant, Teacher, Librarian, HR, Student and Parent — each with the tools they need.
+            Sign in to your {school.term} portal · attendance, grades, fees, library and school updates in one secure place.
           </p>
-          <div className="mt-10 grid max-w-md grid-cols-2 gap-3">
-            {roleOptions.slice(0, 6).map((r) => (
-              <div key={r.value} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
-                <p className="text-sm font-semibold text-white">{r.shortLabel}</p>
-                <p className="mt-0.5 line-clamp-2 text-xs text-brand-200">{r.description}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

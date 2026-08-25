@@ -39,7 +39,7 @@ export default function StudentFees() {
 
   return (
     <div>
-      <PageHeader title="Fees & Finance" subtitle={`Your invoices, payments and receipts — ${student.name}.`} />
+      <PageHeader title="Fees & Finance" subtitle={`Your invoices, payments and receipts · ${student.name}.`} />
 
       {outstanding === 0 ? (
         <Card className="border-success-200 bg-success-25 p-6">
@@ -49,7 +49,7 @@ export default function StudentFees() {
                 <CheckmarkBadge01Icon size={26} />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">All fees settled — {formatMoney(0)} outstanding</p>
+                <p className="text-lg font-bold text-gray-900">All fees settled · {formatMoney(0)} outstanding</p>
                 <p className="text-sm text-gray-600">
                   {lastPayment
                     ? `Last payment on ${formatDate(lastPayment.date)}. Thank you!`
@@ -94,7 +94,7 @@ export default function StudentFees() {
         <StatCard
           label="Paid this year"
           value={formatMoney(paid)}
-          delta={billed > 0 ? `${Math.round((paid / billed) * 100)}%` : "—"}
+          delta={billed > 0 ? `${Math.round((paid / billed) * 100)}%` : "None"}
           deltaLabel="collection"
           iconBg="bg-success-50 text-success-600"
         />

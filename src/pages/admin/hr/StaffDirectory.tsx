@@ -94,7 +94,7 @@ export default function StaffDirectory() {
       role: form.role.trim(),
       department: form.department,
       email: form.email.trim().toLowerCase(),
-      phone: form.phone.trim() || "—",
+      phone: form.phone.trim() || "None",
       salary: Number(form.salary) || 0,
     });
     toast(`${next.name} added to staff directory`);
@@ -386,7 +386,7 @@ function StaffForm({
         <input className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} />
       </Field>
       <Field label="Role / title" required>
-        <input className={inputClass} value={form.role} onChange={(e) => set("role", e.target.value)} placeholder="e.g. Teacher — Mathematics" />
+        <input className={inputClass} value={form.role} onChange={(e) => set("role", e.target.value)} placeholder="e.g. Teacher · Mathematics" />
       </Field>
       <Field label="Department" required>
         <select className={inputClass} value={form.department} onChange={(e) => set("department", e.target.value)}>

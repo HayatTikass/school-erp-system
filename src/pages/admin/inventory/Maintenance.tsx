@@ -1,9 +1,9 @@
 import { PageHeader, Card, CardHeader, Badge, statusTone, Table, THead, TRow, TCell, StatCard } from "../../../components/ui";
 
 const maintenanceRequests = [
-  { id: "MR-71", item: "School bus — Coaster (GS 4521-24)", issue: "Brake pads worn, service due", raised: "Mr. Eric Nkrumah", priority: "High", status: "In progress" },
-  { id: "MR-72", item: "Projector — JHS 3A", issue: "Lamp flickering during lessons", raised: "Ms. Josephine Baah", priority: "Medium", status: "Pending" },
-  { id: "MR-73", item: "Ceiling fans — Block A Rm 2", issue: "Two fans not working", raised: "Mrs. Grace Antwi", priority: "Low", status: "Pending" },
+  { id: "MR-71", item: "School bus · Coaster (GS 4521-24)", issue: "Brake pads worn, service due", raised: "Mr. Eric Nkrumah", priority: "High", status: "In progress" },
+  { id: "MR-72", item: "Projector · JHS 3A", issue: "Lamp flickering during lessons", raised: "Ms. Josephine Baah", priority: "Medium", status: "Pending" },
+  { id: "MR-73", item: "Ceiling fans · Block A Rm 2", issue: "Two fans not working", raised: "Mrs. Grace Antwi", priority: "Low", status: "Pending" },
 ];
 
 export default function InventoryMaintenance() {

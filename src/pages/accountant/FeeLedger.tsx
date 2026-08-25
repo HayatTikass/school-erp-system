@@ -82,7 +82,7 @@ export default function FeeLedger() {
     <div>
       <PageHeader
         title="Student fee ledger"
-        subtitle="Every student — billed amount, paid, balance and payment status."
+        subtitle="Every student · billed amount, paid, balance and payment status."
         actions={
           <>
             <Link to="/accountant">
@@ -183,7 +183,7 @@ export default function FeeLedger() {
                       {r.status}
                     </Badge>
                   </TCell>
-                  <TCell className="text-gray-500">{r.lastPayment ? formatDate(r.lastPayment) : "—"}</TCell>
+                  <TCell className="text-gray-500">{r.lastPayment ? formatDate(r.lastPayment) : "None"}</TCell>
                 </TRow>
               );
             })}

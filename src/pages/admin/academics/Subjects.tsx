@@ -22,7 +22,7 @@ export default function AcademicsSubjects() {
     addSubject({
       name: subjectForm.name.trim(),
       code: subjectForm.code.trim().toUpperCase(),
-      teacher: subjectForm.teacher.trim() || "—",
+      teacher: subjectForm.teacher.trim() || "None",
       color: subjectForm.color,
     });
     toast(`${subjectForm.name.trim()} added to curriculum`);
@@ -34,7 +34,7 @@ export default function AcademicsSubjects() {
     <div>
       <PageHeader
         title="Subjects"
-        subtitle={`Academic year ${school.year} · ${school.term} — curriculum and subject assignments.`}
+        subtitle={`Academic year ${school.year} · ${school.term} · curriculum and subject assignments.`}
         actions={
           <Button
             icon={<Add01Icon size={18} />}
@@ -63,7 +63,7 @@ export default function AcademicsSubjects() {
                 </TCell>
                 <TCell>{s.code}</TCell>
                 <TCell>{s.teacher}</TCell>
-                <TCell>JHS 1 – JHS 3</TCell>
+                <TCell>JHS 1 to JHS 3</TCell>
                 <TCell>{s.code === "MATH" || s.code === "ENG" ? 6 : 4}</TCell>
               </TRow>
             ))}

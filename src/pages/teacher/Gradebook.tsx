@@ -4,12 +4,13 @@ import { PageHeader, Card, CardHeader, Badge, statusTone, Button, Avatar, Table,
 import { useAppStore } from "../../store/AppStore";
 import { useToast } from "../../components/Toast";
 import { computeGrade } from "../../store/domain";
+import { LABEL_SEP } from "../../lib/display";
 
-const CLASS_OPTIONS = ["JHS 2A — Term 3", "JHS 2B — Term 3", "JHS 3A — Term 3"];
+const CLASS_OPTIONS = ["JHS 2A · Term 3", "JHS 2B · Term 3", "JHS 3A · Term 3"];
 const SUBJECT = "Mathematics";
 
 function parseClass(option: string) {
-  return option.split(" — ")[0]?.trim() ?? option;
+  return option.split(LABEL_SEP)[0]?.trim() ?? option;
 }
 
 export default function TeacherGradebook() {
@@ -36,7 +37,7 @@ export default function TeacherGradebook() {
 
   const failing = rows.filter((r) => r.total < 50).length;
   const avg = rows.length ? Math.round(rows.reduce((a, r) => a + r.total, 0) / rows.length) : 0;
-  const highest = rows.reduce((best, r) => (r.total > best.total ? r : best), rows[0] ?? { total: 0, student: { name: "—" } });
+  const highest = rows.reduce((best, r) => (r.total > best.total ? r : best), rows[0] ?? { total: 0, student: { name: "None" } });
   const entered = rows.filter((r) => r.test1 > 0 || r.test2 > 0 || r.exam > 0).length;
   const allSubmitted = rows.every((r) => {
     const g = grades.find((gr) => gr.studentId === r.student.id && gr.subject === SUBJECT);
@@ -57,14 +58,14 @@ export default function TeacherGradebook() {
 
   const handleSubmit = () => {
     submitGradesForClass(className, SUBJECT);
-    toast(`Grades for ${className} — ${SUBJECT} submitted for approval`, "success");
+    toast(`Grades for ${className} · ${SUBJECT} submitted for approval`, "success");
   };
 
   return (
     <div>
       <PageHeader
         title="Gradebook & Assessments"
-        subtitle={`${SUBJECT} — record scores and submit grades for approval.`}
+        subtitle={`${SUBJECT} · record scores and submit grades for approval.`}
         actions={
           <>
             <Select options={CLASS_OPTIONS} value={classOption} onChange={setClassOption} />
@@ -80,18 +81,18 @@ export default function TeacherGradebook() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Class average" value={`${avg}%`} delta={`${rows.length} students`} deltaLabel="" />
-        <StatCard label="Highest score" value={`${highest?.total ?? 0}%`} delta={highest?.student?.name ?? "—"} deltaLabel="" iconBg="bg-success-50 text-success-600" />
+        <StatCard label="Highest score" value={`${highest?.total ?? 0}%`} delta={highest?.student?.name ?? "None"} deltaLabel="" iconBg="bg-success-50 text-success-600" />
         <StatCard label="Failing (<50%)" value={String(failing)} delta="flagged for support" deltaLabel="" positive={false} iconBg="bg-error-50 text-error-600" />
         <StatCard label="Grades entered" value={`${entered}/${rows.length}`} delta={`${rows.length - entered} remaining`} deltaLabel="" positive={entered === rows.length} iconBg="bg-warning-50 text-warning-600" />
       </div>
 
       <Card className="mt-6">
         <CardHeader
-          title={`Term 3 — ${SUBJECT} (${className})`}
+          title={`Term 3 · ${SUBJECT} (${className})`}
           subtitle="Weighting: Test 1 (20%) · Test 2 (20%) · Exam (60%)"
           action={
             <Badge tone={allSubmitted ? "success" : "warning"} dot>
-              {allSubmitted ? "Submitted" : "Draft — not submitted"}
+              {allSubmitted ? "Submitted" : "Draft · not submitted"}
             </Badge>
           }
         />

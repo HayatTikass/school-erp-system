@@ -118,7 +118,7 @@ export default function ParentDashboard() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-gray-900">{slot.mon}</p>
-                        <p className="text-xs text-gray-500">{subj?.teacher ?? "—"}</p>
+                        <p className="text-xs text-gray-500">{subj?.teacher ?? "None"}</p>
                       </div>
                       <span className="flex items-center gap-1.5 text-sm text-gray-500">
                         <Clock01Icon size={15} /> {slot.time}

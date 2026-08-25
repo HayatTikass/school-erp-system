@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SentIcon, Attachment01Icon, PencilEdit02Icon } from "hugeicons-react";
 import { PageHeader, Card, Badge, Button, Avatar, SearchInput } from "./ui";
 import { Modal, Field, inputClass } from "./Modal";
@@ -6,16 +6,29 @@ import { cn } from "../lib/utils";
 import { useAppStore } from "../store/AppStore";
 import { useAuth } from "../auth/AuthContext";
 import { useToast } from "./Toast";
+import { ROLE_META } from "../types/roles";
+
+const emptyNewForm = { recipientId: "", message: "" };
 
 export default function MessagesView({ title, subtitle }: { title: string; subtitle: string }) {
-  const { conversations, sendMessage, startConversation, markConversationRead } = useAppStore();
+  const { users, conversations, sendMessage, startConversation, markConversationRead } = useAppStore();
   const { user } = useAuth();
   const { toast } = useToast();
   const [selected, setSelected] = useState(conversations[0]?.id ?? "");
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
   const [newOpen, setNewOpen] = useState(false);
-  const [newForm, setNewForm] = useState({ name: "", role: "Parent", message: "" });
+  const [newForm, setNewForm] = useState(emptyNewForm);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const recipients = useMemo(() => {
+    return users.filter(
+      (u) =>
+        u.status === "Active" &&
+        u.id !== user?.id &&
+        u.email.toLowerCase() !== (user?.email ?? "").toLowerCase(),
+    );
+  }, [users, user]);
 
   const filtered = useMemo(() => {
     if (!query) return conversations;
@@ -35,6 +48,11 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
     markConversationRead(id);
   };
 
+  const openNew = () => {
+    setNewForm(emptyNewForm);
+    setNewOpen(true);
+  };
+
   const handleSend = () => {
     if (!draft.trim() || !active) return;
     sendMessage(active.id, draft.trim(), user?.name ?? "You");
@@ -42,22 +60,86 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
   };
 
   const handleNewMessage = () => {
-    if (!newForm.name.trim() || !newForm.message.trim()) {
-      toast("Recipient name and message are required", "error");
+    const recipient = recipients.find((u) => u.id === newForm.recipientId);
+    if (!recipient) {
+      toast("Select a recipient", "error");
       return;
     }
-    const convId = startConversation(newForm.name.trim(), newForm.role, newForm.message.trim(), user?.name ?? "You");
-    toast(`Message sent to ${newForm.name.trim()}`);
+    if (!newForm.message.trim()) {
+      toast("Message is required", "error");
+      return;
+    }
+    const convId = startConversation(
+      recipient.name,
+      ROLE_META[recipient.role].shortLabel,
+      newForm.message.trim(),
+      user?.name ?? "You",
+    );
+    toast(`Message sent to ${recipient.name}`);
     setNewOpen(false);
-    setNewForm({ name: "", role: "Parent", message: "" });
+    setNewForm(emptyNewForm);
     setSelected(convId);
   };
+
+  const newMessageModal = (
+    <Modal
+      open={newOpen}
+      onClose={() => setNewOpen(false)}
+      title="New message"
+      subtitle="Start a conversation"
+      footer={
+        <>
+          <Button variant="secondary" onClick={() => setNewOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleNewMessage}>Send message</Button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <Field label="Recipient" required>
+          <select
+            className={inputClass}
+            value={newForm.recipientId}
+            onChange={(e) => setNewForm({ ...newForm, recipientId: e.target.value })}
+          >
+            <option value="">Select recipient…</option>
+            {recipients.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name} · {ROLE_META[u.role].shortLabel}
+              </option>
+            ))}
+          </select>
+          {recipients.length === 0 && (
+            <p className="mt-1.5 text-xs text-gray-500">No other accounts are available to message.</p>
+          )}
+        </Field>
+        <Field label="Message" required>
+          <textarea
+            className={inputClass}
+            rows={4}
+            value={newForm.message}
+            onChange={(e) => setNewForm({ ...newForm, message: e.target.value })}
+          />
+        </Field>
+      </div>
+    </Modal>
+  );
 
   if (!active) {
     return (
       <div>
-        <PageHeader title={title} subtitle={subtitle} actions={<Button icon={<PencilEdit02Icon size={18} />} onClick={() => setNewOpen(true)}>New message</Button>} />
+        <PageHeader
+          title={title}
+          subtitle={subtitle}
+          actions={
+            <Button icon={<PencilEdit02Icon size={18} />} onClick={openNew}>
+              New message
+            </Button>
+          }
+        />
         <Card className="p-10 text-center text-gray-400">No conversations yet. Start a new message.</Card>
+        {newMessageModal}
       </div>
     );
   }
@@ -67,7 +149,11 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
       <PageHeader
         title={title}
         subtitle={subtitle}
-        actions={<Button icon={<PencilEdit02Icon size={18} />} onClick={() => setNewOpen(true)}>New message</Button>}
+        actions={
+          <Button icon={<PencilEdit02Icon size={18} />} onClick={openNew}>
+            New message
+          </Button>
+        }
       />
 
       <Card className="grid flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[340px_1fr]">
@@ -123,7 +209,22 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
           </div>
 
           <div className="flex items-center gap-2 border-t border-gray-200 p-4">
-            <button type="button" className="rounded-lg p-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600" title="Attach file">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) toast(`Attached "${file.name}" (demo · not uploaded)`, "info");
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-lg p-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+              title="Attach file"
+            >
               <Attachment01Icon size={20} />
             </button>
             <input
@@ -138,34 +239,7 @@ export default function MessagesView({ title, subtitle }: { title: string; subti
         </div>
       </Card>
 
-      <Modal
-        open={newOpen}
-        onClose={() => setNewOpen(false)}
-        title="New message"
-        subtitle="Start a conversation"
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setNewOpen(false)}>Cancel</Button>
-            <Button onClick={handleNewMessage}>Send message</Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <Field label="Recipient name" required>
-            <input className={inputClass} value={newForm.name} onChange={(e) => setNewForm({ ...newForm, name: e.target.value })} placeholder="e.g. Mrs. Osei" />
-          </Field>
-          <Field label="Role">
-            <select className={inputClass} value={newForm.role} onChange={(e) => setNewForm({ ...newForm, role: e.target.value })}>
-              {["Parent", "Teacher", "Staff", "Student"].map((r) => (
-                <option key={r}>{r}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Message" required>
-            <textarea className={inputClass} rows={4} value={newForm.message} onChange={(e) => setNewForm({ ...newForm, message: e.target.value })} />
-          </Field>
-        </div>
-      </Modal>
+      {newMessageModal}
     </div>
   );
 }

@@ -66,7 +66,7 @@ export default function TeacherReportCards() {
     <div>
       <PageHeader
         title="Report Card Generation"
-        subtitle={`${CLASS_NAME} · Term 3 — add remarks and submit for admin sign-off.`}
+        subtitle={`${CLASS_NAME} · Term 3 · add remarks and submit for admin sign-off.`}
         actions={
           <>
             <Select options={TERM_OPTIONS} value={term} onChange={setTerm} />
@@ -86,7 +86,7 @@ export default function TeacherReportCards() {
 
       <Card className="mt-6">
         <CardHeader
-          title={`Term 3 report cards — ${CLASS_NAME}`}
+          title={`Term 3 report cards · ${CLASS_NAME}`}
           subtitle="Preview each slip before submitting"
           action={<Badge tone="warning" dot>Batch in draft</Badge>}
         />

@@ -6,18 +6,19 @@ import { useToast } from "../../components/Toast";
 import { useAppStore } from "../../store/AppStore";
 import { useAuth } from "../../auth/AuthContext";
 import type { AttendanceMark } from "../../store/domain";
+import { LABEL_SEP } from "../../lib/display";
 
 const CLASS_OPTIONS = [
-  "JHS 2A — Mathematics",
-  "JHS 2B — Mathematics",
-  "JHS 3A — Mathematics",
-  "JHS 1A — Mathematics",
+  "JHS 2A · Mathematics",
+  "JHS 2B · Mathematics",
+  "JHS 3A · Mathematics",
+  "JHS 1A · Mathematics",
 ];
 
 type Mark = "present" | "absent" | "late";
 
 function parseClass(option: string) {
-  return option.split(" — ")[0]?.trim() ?? option;
+  return option.split(LABEL_SEP)[0]?.trim() ?? option;
 }
 
 function todayLabel() {
@@ -80,7 +81,7 @@ export default function TeacherAttendance() {
     submitAttendance(className, today, payload, user?.name);
     setDirty(false);
     toast(
-      `Register submitted — ${counts.present ?? 0} present, ${counts.absent ?? 0} absent, ${counts.late ?? 0} late`,
+      `Register submitted · ${counts.present ?? 0} present, ${counts.absent ?? 0} absent, ${counts.late ?? 0} late`,
       "success",
     );
   };
@@ -89,7 +90,7 @@ export default function TeacherAttendance() {
     <div>
       <PageHeader
         title="Attendance Tracking"
-        subtitle={`Mark today's register — ${todayLabel()}.`}
+        subtitle={`Mark today's register · ${todayLabel()}.`}
         actions={
           <>
             <Select options={CLASS_OPTIONS} value={classOption} onChange={setClassOption} />
@@ -109,7 +110,7 @@ export default function TeacherAttendance() {
       <Card className="mt-6">
         <CardHeader
           title={`${className} register`}
-          subtitle={`${roster.length} students · period 1 (7:30 – 8:50)`}
+          subtitle={`${roster.length} students · period 1 (7:30 to 8:50)`}
           action={dirty ? <Badge tone="brand" dot>Unsaved changes</Badge> : <Badge tone="success" dot>Saved</Badge>}
         />
         <div className="divide-y divide-gray-100">

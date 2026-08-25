@@ -97,10 +97,10 @@ export default function Payroll() {
       role: form.role.trim(),
       department: form.department,
       email: form.email.trim().toLowerCase(),
-      phone: form.phone.trim() || "—",
+      phone: form.phone.trim() || "None",
       salary,
     });
-    toast(`Salary record created for ${next.name} — ${formatMoney(salary)}`);
+    toast(`Salary record created for ${next.name} · ${formatMoney(salary)}`);
     setAddOpen(false);
   };
 
@@ -119,7 +119,7 @@ export default function Payroll() {
       phone: form.phone.trim() || editStaff.phone,
       salary,
     });
-    toast(`Salary updated for ${editStaff.name} — ${formatMoney(salary)}`);
+    toast(`Salary updated for ${editStaff.name} · ${formatMoney(salary)}`);
     setEditStaff(null);
   };
 
@@ -358,7 +358,7 @@ function SalaryForm({
           className={inputClass}
           value={form.role}
           onChange={(e) => set("role", e.target.value)}
-          placeholder="e.g. Teacher — Mathematics"
+          placeholder="e.g. Teacher · Mathematics"
         />
       </Field>
       <Field label="Department" required>

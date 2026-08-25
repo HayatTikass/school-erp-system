@@ -21,13 +21,7 @@ npm run dev      # http://localhost:5173
 npm run build    # type-check + production build
 ```
 
-Sign in with **role + email + password**.
-
-| Role | Email |
-| --- | --- |
-| Admin | `admin@kingsford.edu.gh` (password `password`) |
-
-**Admin** creates all other accounts under Users & Roles. Students must be linked to a parent.
+Sign in with **role + email + password**. Every login is authenticated against Supabase Auth. Accounts are created by the school admin under Users & Roles.
 
 ## Portals & pages
 

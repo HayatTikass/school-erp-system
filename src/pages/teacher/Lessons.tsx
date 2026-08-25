@@ -77,7 +77,7 @@ export default function TeacherLessons() {
 
       <Card className="mt-6 p-5">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-gray-900">Term 3 syllabus progress — Mathematics</h3>
+          <h3 className="text-base font-semibold text-gray-900">Term 3 syllabus progress · Mathematics</h3>
           <span className="text-sm font-semibold text-gray-700">
             {completed} of {mathPlans.length} topics
           </span>
@@ -99,7 +99,7 @@ export default function TeacherLessons() {
               {lp.subject} · {lp.className}
             </p>
             <p className="mt-3 line-clamp-2 text-sm text-gray-600">
-              Linked to curriculum objective B7.2 — learners can apply algebraic reasoning to solve real-world problems.
+              Linked to curriculum objective B7.2 · learners can apply algebraic reasoning to solve real-world problems.
             </p>
             <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-4">
               <span className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -188,7 +188,7 @@ export default function TeacherLessons() {
             <p>
               <span className="font-medium text-gray-900">Resources:</span> {openPlan.resources} attached
             </p>
-            <p>Curriculum objective B7.2 — learners apply algebraic reasoning to solve real-world problems.</p>
+            <p>Curriculum objective B7.2 · learners apply algebraic reasoning to solve real-world problems.</p>
           </div>
         )}
       </Modal>

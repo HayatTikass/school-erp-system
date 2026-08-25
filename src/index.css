@@ -5,7 +5,7 @@
   --font-sans: "Nunito Sans Variable", "Nunito Sans", ui-sans-serif, system-ui,
     sans-serif;
 
-  /* Untitled UI — Brand (Violet) */
+  /* Untitled UI: Brand (Violet) */
   --color-brand-25: #fcfaff;
   --color-brand-50: #f9f5ff;
   --color-brand-100: #f4ebff;
@@ -19,7 +19,7 @@
   --color-brand-900: #42307d;
   --color-brand-950: #2c1c5f;
 
-  /* Untitled UI — Gray */
+  /* Untitled UI: Gray */
   --color-gray-25: #fcfcfd;
   --color-gray-50: #f9fafb;
   --color-gray-100: #f2f4f7;
@@ -33,7 +33,7 @@
   --color-gray-900: #101828;
   --color-gray-950: #0c111d;
 
-  /* Untitled UI — Success (Green) */
+  /* Untitled UI: Success (Green) */
   --color-success-25: #f6fef9;
   --color-success-50: #ecfdf3;
   --color-success-100: #d1fadf;
@@ -44,7 +44,7 @@
   --color-success-600: #039855;
   --color-success-700: #027a48;
 
-  /* Untitled UI — Warning (Amber) */
+  /* Untitled UI: Warning (Amber) */
   --color-warning-25: #fffcf5;
   --color-warning-50: #fffaeb;
   --color-warning-100: #fef0c7;
@@ -55,7 +55,7 @@
   --color-warning-600: #dc6803;
   --color-warning-700: #b54708;
 
-  /* Untitled UI — Error (Red) */
+  /* Untitled UI: Error (Red) */
   --color-error-25: #fffbfa;
   --color-error-50: #fef3f2;
   --color-error-100: #fee4e2;
@@ -66,7 +66,7 @@
   --color-error-600: #d92d20;
   --color-error-700: #b42318;
 
-  /* Untitled UI — Blue */
+  /* Untitled UI: Blue */
   --color-blue-25: #f5faff;
   --color-blue-50: #eff8ff;
   --color-blue-100: #d1e9ff;
@@ -77,28 +77,28 @@
   --color-blue-600: #1570ef;
   --color-blue-700: #175cd3;
 
-  /* Untitled UI — Indigo */
+  /* Untitled UI: Indigo */
   --color-indigo-50: #eef4ff;
   --color-indigo-100: #e0eaff;
   --color-indigo-500: #6172f3;
   --color-indigo-600: #444ce7;
   --color-indigo-700: #3538cd;
 
-  /* Untitled UI — Pink */
+  /* Untitled UI: Pink */
   --color-pink-50: #fdf2fa;
   --color-pink-100: #fce7f6;
   --color-pink-500: #ee46bc;
   --color-pink-600: #dd2590;
   --color-pink-700: #c11574;
 
-  /* Untitled UI — Orange */
+  /* Untitled UI: Orange */
   --color-orange-50: #fff6ed;
   --color-orange-100: #ffead5;
   --color-orange-500: #ef6820;
   --color-orange-600: #e04f16;
   --color-orange-700: #b93815;
 
-  /* Untitled UI — Cyan / Teal */
+  /* Untitled UI: Cyan / Teal */
   --color-cyan-50: #ecfdff;
   --color-cyan-100: #cff9fe;
   --color-cyan-500: #06aed4;

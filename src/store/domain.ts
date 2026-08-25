@@ -263,7 +263,7 @@ export function seedSubmissions(
 export const seedAssignments: AssignmentItem[] = [
   { id: "A1", title: "Quadratic equations worksheet", subject: "Mathematics", className: "JHS 2A", due: "2026-07-08", status: "Open", totalStudents: 34, createdBy: "USR-T01" },
   { id: "A2", title: "Essay: My community and I", subject: "English Language", className: "JHS 2A", due: "2026-07-06", status: "Grading", totalStudents: 34, createdBy: "USR-T02" },
-  { id: "A3", title: "Lab report — photosynthesis", subject: "Integrated Science", className: "JHS 2A", due: "2026-07-10", status: "Open", totalStudents: 34 },
+  { id: "A3", title: "Lab report · photosynthesis", subject: "Integrated Science", className: "JHS 2A", due: "2026-07-10", status: "Open", totalStudents: 34 },
   { id: "A4", title: "Map reading exercise", subject: "Social Studies", className: "JHS 2A", due: "2026-07-04", status: "Closed", totalStudents: 34 },
   { id: "A5", title: "Build a simple HTML page", subject: "ICT", className: "JHS 2A", due: "2026-07-12", status: "Open", totalStudents: 34 },
 ];
@@ -279,8 +279,8 @@ export const seedConversations: Conversation[] = [
     avatarColor: "bg-brand-100 text-brand-700",
     messages: [
       { id: "m1", fromMe: false, senderName: "Mrs. Grace Antwi", text: "Good morning. I wanted to share that Abena has shown remarkable improvement in her essays this term.", time: "9:02 AM" },
-      { id: "m2", fromMe: true, senderName: "You", text: "Thank you for the update — we have been practising at home.", time: "9:15 AM" },
-      { id: "m3", fromMe: false, senderName: "Mrs. Grace Antwi", text: "Wonderful. Keep it up — past questions go home this Friday.", time: "10:24 AM" },
+      { id: "m2", fromMe: true, senderName: "You", text: "Thank you for the update · we have been practising at home.", time: "9:15 AM" },
+      { id: "m3", fromMe: false, senderName: "Mrs. Grace Antwi", text: "Wonderful. Keep it up · past questions go home this Friday.", time: "10:24 AM" },
     ],
   },
   {
@@ -310,14 +310,14 @@ export const seedConversations: Conversation[] = [
   {
     id: "MSG-4",
     withName: "Kwame Osei",
-    withRole: "Parent — Abena Osei",
+    withRole: "Parent · Abena Osei",
     preview: "Thank you for the update on the science project. We will…",
     time: "Mon",
     unread: false,
     avatarColor: "bg-success-100 text-success-700",
     messages: [
       { id: "m6", fromMe: false, senderName: "Kwame Osei", text: "Thank you for the update on the science project. We will support from home.", time: "Mon" },
-      { id: "m7", fromMe: true, senderName: "You", text: "Appreciate it — Abena is doing well.", time: "Mon" },
+      { id: "m7", fromMe: true, senderName: "You", text: "Appreciate it · Abena is doing well.", time: "Mon" },
     ],
   },
 ];

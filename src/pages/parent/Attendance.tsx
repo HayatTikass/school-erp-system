@@ -74,7 +74,7 @@ export default function ParentAttendance() {
   return (
     <div>
       <PageHeader
-        title={selectedChild ? `Attendance Monitoring — ${selectedChild.name.split(" ")[0]}` : "Attendance Monitoring"}
+        title={selectedChild ? `Attendance Monitoring · ${selectedChild.name.split(" ")[0]}` : "Attendance Monitoring"}
         subtitle="Daily records, alerts and excuse submission."
         actions={
           children.length > 0 ? (
@@ -114,7 +114,7 @@ export default function ParentAttendance() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <p className="px-5 pb-5 text-sm text-gray-500">No daily records yet — term attendance is {selectedChild.attendance}%.</p>
+                <p className="px-5 pb-5 text-sm text-gray-500">No daily records yet · term attendance is {selectedChild.attendance}%.</p>
               )}
             </Card>
 
